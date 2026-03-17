@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阶段三：系统架构基础 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        /* 阶段头部 */
+        .phase-header {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+
+        .phase-badge.in-progress {
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+        }
+
+        .phase-illustration {
+            width: 160px;
+            height: 140px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 16px 32px rgba(232, 111, 81, 0.2);
+        }
+
+        .phase-illustration::before {
+            content: '🏗️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px;
+        }
+
+        .phase-illustration::after {
+            content: '3';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: var(--bg-primary);
+            border: 3px solid var(--text-primary);
+            border-radius: 50%;
+            box-shadow: 0 3px 0 var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .phase-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .phase-header p {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* 进度总览卡片 */
+        .progress-overview {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-value.completed {
+            color: var(--success);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .progress-bar-wrap {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 33%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-bar-fill.completed {
+            background: linear-gradient(90deg, var(--success) 0%, #73D13D 100%);
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 课程列表 */
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .section-title-wrap h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .lesson-list {
+            margin-bottom: 60px;
+        }
+
+        .lesson-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .lesson-card.completed {
+            border-left: 4px solid var(--success);
+        }
+
+        .lesson-card.active {
+            border-left: 4px solid var(--accent);
+        }
+
+        .lesson-card.locked {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .lesson-card.locked:hover {
+            transform: none;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lesson-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .lesson-number {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .lesson-card.completed .lesson-number {
+            background: var(--success);
+            color: white;
+        }
+
+        .lesson-card.active .lesson-number {
+            background: var(--accent);
+            color: white;
+        }
+
+        .lesson-card.locked .lesson-number {
+            background: var(--bg-primary);
+            color: var(--text-muted);
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-info h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .lesson-card.locked .lesson-info h3 {
+            color: var(--text-muted);
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lesson-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .lesson-desc {
+            padding-left: 60px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .lesson-card.locked .lesson-desc {
+            color: var(--text-muted);
+        }
+
+        .lesson-footer {
+            padding-left: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lesson-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-tag {
+            padding: 5px 12px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .lesson-card.locked .lesson-tag {
+            background: var(--bg-primary);
+            color: var(--text-muted);
+        }
+
+        .lesson-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: rgba(82, 196, 26, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.active {
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+        }
+
+        .status-badge.locked {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-muted);
+        }
+
+        .btn-review, .btn-continue, .btn-start {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-review {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+
+        .btn-review:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-continue, .btn-start {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-continue:hover, .btn-start:hover {
+            background: #D45A3D;
+            transform: translateY(-1px);
+        }
+
+        .btn-locked {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* 学习说明 */
+        .info-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .info-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 14px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .info-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* 知识点总结 */
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .knowledge-item {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .knowledge-item h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .knowledge-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 架构模式展示 */
+        .architecture-showcase {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .architecture-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .architecture-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .architecture-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 16px;
+        }
+
+        .architecture-card h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .architecture-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* 下一阶段预览 */
+        .next-phase {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.05) 0%, rgba(245, 166, 35, 0.05) 100%);
+            border: 2px dashed var(--accent);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .next-phase-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .next-phase h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .next-phase p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .btn-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: var(--accent);
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-next:hover {
+            background: #D45A3D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(232, 111, 81, 0.3);
+        }
+
+        .btn-next:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--footer-bg);
+            padding: 48px 24px 40px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo span:first-child {
+            color: var(--accent);
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--footer-text);
+            line-height: 1.8;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .phase-header h1 {
+                font-size: 28px;
+            }
+
+            .progress-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .lesson-desc,
+            .lesson-footer {
+                padding-left: 0;
+            }
+
+            .lesson-header {
+                margin-bottom: 16px;
+            }
+
+            .lesson-footer {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .knowledge-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .architecture-showcase {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lesson-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .lesson-card:nth-child(1) { animation-delay: 0.1s; }
+        .lesson-card:nth-child(2) { animation-delay: 0.15s; }
+        .lesson-card:nth-child(3) { animation-delay: 0.2s; }
+        .lesson-card:nth-child(4) { animation-delay: 0.25s; }
+        .lesson-card:nth-child(5) { animation-delay: 0.3s; }
+        .lesson-card:nth-child(6) { animation-delay: 0.35s; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="pm-tech-learning.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <a href="pm-tech-learning.html" class="back-link">
+                <span>←</span>
+                <span>返回学习路径</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 阶段头部 -->
+        <section class="phase-header">
+            <div class="phase-badge in-progress">
+                <span>●</span>
+                <span>进行中</span>
+            </div>
+            <div class="phase-illustration"></div>
+            <h1>阶段三：系统架构基础</h1>
+            <p>深入理解系统架构设计的核心概念，掌握单体架构与微服务架构的优劣对比，学习如何设计可扩展、高可用的系统架构。</p>
+        </section>
+
+        <!-- 进度总览 -->
+        <section class="progress-overview">
+            <div class="progress-header">
+                <h2 class="progress-title">学习进度</h2>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">2/6</div>
+                        <div class="stat-label">课程完成</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">学习分钟</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1</div>
+                        <div class="stat-label">实践练习</div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill"></div>
+                </div>
+            </div>
+            <div class="progress-meta">
+                <span>💪 继续加油，已完成 33%</span>
+                <span>最近学习：2024年1月20日</span>
+            </div>
+        </section>
+
+        <!-- 课程列表 -->
+        <section class="lesson-list">
+            <div class="section-title-wrap">
+                <div class="section-icon">📚</div>
+                <h2>课程列表</h2>
+            </div>
+
+            <!-- 课程 1 -->
+            <div class="lesson-card completed" onclick="window.location.href='lesson-3-1-detail.html'">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>3.1 什么是系统架构</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 18分钟</span>
+                            <span>📄 图文课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">从宏观视角理解系统架构的定义与重要性，学习架构设计的核心目标：高可用、可扩展、易维护。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">架构设计</span>
+                        <span class="lesson-tag">高可用</span>
+                        <span class="lesson-tag">可扩展</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" onclick="event.stopPropagation(); window.location.href='lesson-3-1-detail.html'">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 2 -->
+            <div class="lesson-card completed" onclick="window.location.href='lesson-3-2-detail.html'">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>3.2 单体架构详解</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 22分钟</span>
+                            <span>🎬 视频课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">深入了解单体架构的特点、优缺点及适用场景。理解为什么许多初创公司选择从单体架构开始。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">单体架构</span>
+                        <span class="lesson-tag">模块化</span>
+                        <span class="lesson-tag">部署</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" onclick="event.stopPropagation(); window.location.href='lesson-3-2-detail.html'">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 3 -->
+            <div class="lesson-card active" onclick="window.location.href='lesson-3-3-detail.html'">
+                <div class="lesson-header">
+                    <div class="lesson-number">3</div>
+                    <div class="lesson-info">
+                        <h3>3.3 微服务架构入门</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 25分钟</span>
+                            <span>📄 图文课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">学习微服务架构的核心概念：服务拆分、独立部署、服务通信。理解微服务带来的优势与挑战。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">微服务</span>
+                        <span class="lesson-tag">服务拆分</span>
+                        <span class="lesson-tag">API网关</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge active">● 学习中</span>
+                        <button class="btn-continue" onclick="event.stopPropagation(); window.location.href='lesson-3-3-detail.html'">继续学习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 4 -->
+            <div class="lesson-card active" onclick="window.location.href='lesson-3-4-detail.html'">
+                <div class="lesson-header">
+                    <div class="lesson-number">4</div>
+                    <div class="lesson-info">
+                        <h3>3.4 服务间通信方式</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 28分钟</span>
+                            <span>📄 图文课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">掌握微服务间的同步与异步通信方式：REST API、gRPC、消息队列、事件驱动。学会根据场景选择合适的通信机制。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">REST</span>
+                        <span class="lesson-tag">消息队列</span>
+                        <span class="lesson-tag">事件驱动</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge active">● 学习中</span>
+                        <button class="btn-continue" onclick="event.stopPropagation(); window.location.href='lesson-3-4-detail.html'">开始学习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 5 -->
+            <div class="lesson-card active" onclick="window.location.href='lesson-3-5-detail.html'">
+                <div class="lesson-header">
+                    <div class="lesson-number">5</div>
+                    <div class="lesson-info">
+                        <h3>3.5 数据一致性策略</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 26分钟</span>
+                            <span>📄 图文课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">理解分布式系统中的数据一致性挑战，学习CAP定理、BASE理论、强一致性、最终一致性、Saga模式等核心概念与解决方案。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">CAP定理</span>
+                        <span class="lesson-tag">一致性</span>
+                        <span class="lesson-tag">Saga</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge active">● 学习中</span>
+                        <button class="btn-continue" onclick="event.stopPropagation(); window.location.href='lesson-3-5-detail.html'">开始学习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 6 -->
+            <div class="lesson-card active" onclick="window.location.href='lesson-3-6-detail.html'">
+                <div class="lesson-header">
+                    <div class="lesson-number">6</div>
+                    <div class="lesson-info">
+                        <h3>3.6 阶段实战：设计电商系统架构</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 35分钟</span>
+                            <span>🎯 阶段实战</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">从零设计一个完整的电商系统架构，涵盖系统架构图、服务拆分、技术选型、数据库设计、缓存策略等核心内容。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">架构设计</span>
+                        <span class="lesson-tag">服务拆分</span>
+                        <span class="lesson-tag">缓存策略</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge active">● 学习中</span>
+                        <button class="btn-continue" onclick="event.stopPropagation(); window.location.href='lesson-3-6-detail.html'">开始学习</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学习说明 -->
+        <section class="info-section">
+            <h3><span>💡</span> 本阶段你将掌握</h3>
+            <ul class="info-list">
+                <li>理解系统架构设计的核心原则与目标，能够评估不同架构方案的优劣</li>
+                <li>掌握单体架构与微服务架构的特点，能够根据业务场景做出合理选择</li>
+                <li>理解服务间通信的各种方式，学会设计高效的服务协作机制</li>
+                <li>掌握分布式系统中的数据一致性策略，能够应对复杂的数据同步场景</li>
+                <li>具备独立设计中等复杂度系统架构的能力，产出专业的架构设计文档</li>
+            </ul>
+        </section>
+
+        <!-- 核心知识点 -->
+        <section class="info-section">
+            <h3><span>🎯</span> 核心知识点预览</h3>
+            <div class="knowledge-grid">
+                <div class="knowledge-item">
+                    <h4>架构设计三要素</h4>
+                    <p>高可用性、可扩展性、可维护性的平衡与取舍</p>
+                </div>
+                <div class="knowledge-item">
+                    <h4>单体 vs 微服务</h4>
+                    <p>理解两种架构模式的适用场景与演进路径</p>
+                </div>
+                <div class="knowledge-item">
+                    <h4>服务拆分原则</h4>
+                    <p>按业务领域拆分，遵循高内聚低耦合原则</p>
+                </div>
+                <div class="knowledge-item">
+                    <h4>CAP 定理</h4>
+                    <p>一致性、可用性、分区容错性的不可能三角</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 架构模式展示 -->
+        <section class="info-section">
+            <h3><span>🏗️</span> 常见架构模式</h3>
+            <div class="architecture-showcase">
+                <div class="architecture-card">
+                    <div class="architecture-icon">🎯</div>
+                    <h4>分层架构</h4>
+                    <p>表现层、业务层、数据层清晰分离</p>
+                </div>
+                <div class="architecture-card">
+                    <div class="architecture-icon">🧩</div>
+                    <h4>微服务架构</h4>
+                    <p>服务独立部署，团队自治协作</p>
+                </div>
+                <div class="architecture-card">
+                    <div class="architecture-icon">⚡</div>
+                    <h4>事件驱动架构</h4>
+                    <p>基于消息队列的异步通信模式</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 下一阶段 -->
+        <section class="next-phase">
+            <div class="next-phase-icon">☁️</div>
+            <h3>展望下一阶段</h3>
+            <p>阶段四将带你深入了解云原生技术、容器化部署和DevOps实践，掌握现代化运维的核心技能。</p>
+            <button class="btn-next" disabled>
+                <span>请先完成本阶段课程</span>
+            </button>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>◉</span>
+                <span>PM Tech Hub</span>
+            </div>
+            <p class="footer-copy">
+                © 2024 PM Tech Hub. 专为产品经理打造的技术学习平台。<br>
+                让技术不再成为产品路上的绊脚石
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 卡片点击效果
+        document.querySelectorAll('.lesson-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('button') && !this.classList.contains('locked')) {
+                    console.log('打开课程详情');
+                }
+            });
+        });
+
+        // 复习按钮点击
+        document.querySelectorAll('.btn-review').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                alert('正在进入课程复习模式...');
+            });
+        });
+
+        // 继续学习按钮点击
+        document.querySelectorAll('.btn-continue').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                alert('继续学习 3.3 微服务架构入门...');
+            });
+        });
+    </script>
+</body>
+</html>

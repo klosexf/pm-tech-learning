@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.4 数据是如何流转的 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .progress-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--bg-code);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-mini-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb .current {
+            color: var(--text-secondary);
+        }
+
+        /* 课程头部 */
+        .lesson-header {
+            margin-bottom: 48px;
+        }
+
+        .lesson-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .lesson-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--accent);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
+        .lesson-type {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lesson-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .lesson-intro {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 680px;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .content-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-primary);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.9;
+        }
+
+        /* 数据流转图示 */
+        .data-flow-diagram {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 28px 0;
+        }
+
+        .flow-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow-box {
+            width: 120px;
+            padding: 20px 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+            position: relative;
+        }
+
+        .flow-box .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .flow-box .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .flow-box.user {
+            border-top: 3px solid var(--info);
+        }
+
+        .flow-box.frontend {
+            border-top: 3px solid var(--warning);
+        }
+
+        .flow-box.backend {
+            border-top: 3px solid var(--accent);
+        }
+
+        .flow-box.database {
+            border-top: 3px solid var(--success);
+        }
+
+        .flow-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .flow-arrow {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        .flow-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 3px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        /* 数据流向详情 */
+        .flow-detail {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 24px 0;
+        }
+
+        .flow-step-detail {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .flow-step-detail:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        .step-meta {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step-meta.request {
+            background: rgba(24, 144, 255, 0.15);
+            color: var(--info);
+        }
+
+        .step-meta.process {
+            background: rgba(232, 111, 81, 0.15);
+            color: var(--accent);
+        }
+
+        .step-meta.response {
+            background: rgba(82, 196, 26, 0.15);
+            color: var(--success);
+        }
+
+        /* 场景卡片 */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 28px 0;
+        }
+
+        .scenario-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .scenario-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .scenario-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .scenario-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* 数据包展示 */
+        .packet-visual {
+            background: var(--bg-code);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border-left: 4px solid var(--info);
+        }
+
+        .packet-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .packet-type {
+            padding: 4px 12px;
+            background: var(--info);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 6px;
+        }
+
+        .packet-type.response {
+            background: var(--success);
+        }
+
+        .packet-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .packet-content {
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .packet-content .key {
+            color: var(--accent);
+        }
+
+        .packet-content .string {
+            color: var(--success);
+        }
+
+        .packet-content .number {
+            color: var(--info);
+        }
+
+        /* 重点框 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box p, .highlight-box li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .highlight-box li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* 关键概念卡片 */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 28px 0;
+        }
+
+        .concept-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .concept-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .concept-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .concept-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* 实战案例 */
+        .case-study {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 28px 0;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .case-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .case-title-wrap h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .case-title-wrap span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .case-flow {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .case-step {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 16px 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        .case-step::after {
+            content: '→';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .case-step:last-child::after {
+            display: none;
+        }
+
+        .case-step-icon {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .case-step-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .case-step-role {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* 底部操作栏 */
+        .lesson-footer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        .footer-bar-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-complete {
+            padding: 12px 32px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-complete:hover {
+            background: #389E0D;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+        }
+
+        /* 页面底部留白 */
+        .page-end-spacer {
+            height: 100px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 90px 16px 100px;
+            }
+
+            .lesson-header h1 {
+                font-size: 26px;
+            }
+
+            .content-section {
+                padding: 24px;
+            }
+
+            .flow-container {
+                flex-direction: column;
+            }
+
+            .flow-connector {
+                transform: rotate(90deg);
+                margin: 8px 0;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .case-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .case-step::after {
+                content: '↓';
+                right: 50%;
+                top: 100%;
+                transform: translateX(50%);
+            }
+
+            .footer-bar-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-complete {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-section {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .content-section:nth-child(1) { animation-delay: 0.1s; }
+        .content-section:nth-child(2) { animation-delay: 0.2s; }
+        .content-section:nth-child(3) { animation-delay: 0.3s; }
+        .content-section:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="pm-tech-learning.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <div class="nav-actions">
+                <div class="progress-mini">
+                    <span>课程进度</span>
+                    <div class="progress-mini-bar">
+                        <div class="progress-mini-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 面包屑 -->
+        <nav class="breadcrumb">
+            <a href="pm-tech-learning.html">学习路径</a>
+            <span>›</span>
+            <a href="phase1-detail.html">阶段一</a>
+            <span>›</span>
+            <span class="current">1.4 数据是如何流转的</span>
+        </nav>
+
+        <!-- 课程头部 -->
+        <header class="lesson-header">
+            <div class="lesson-meta-bar">
+                <span class="lesson-number-badge">1.4</span>
+                <span class="lesson-type">⏱ 18分钟 · 📄 图文课程</span>
+            </div>
+            <h1>数据是如何流转的</h1>
+            <p class="lesson-intro">
+                深入理解数据在用户、前端、后端、数据库之间的流转过程。掌握请求-响应模式的核心逻辑，帮助你在需求设计时考虑更全面的数据交互场景。
+            </p>
+        </header>
+
+        <!-- 第一节：数据流转全景图 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🌐</span>
+                数据流转全景图
+            </h2>
+            
+            <p>
+                想象你正在使用一个电商App浏览商品。当你点击"查看详情"时，数据就像快递包裹一样，在多个"站点"之间流转。理解这个过程，能帮助你更好地设计产品功能和排查问题。
+            </p>
+
+            <div class="data-flow-diagram">
+                <div class="flow-title">完整的数据流转链路</div>
+                <div class="flow-container">
+                    <div class="flow-node">
+                        <div class="flow-box user">
+                            <div class="icon">👤</div>
+                            <div class="label">用户</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-connector">
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-label">点击/输入</span>
+                    </div>
+                    
+                    <div class="flow-node">
+                        <div class="flow-box frontend">
+                            <div class="icon">📱</div>
+                            <div class="label">前端</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-connector">
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-label">HTTP请求</span>
+                    </div>
+                    
+                    <div class="flow-node">
+                        <div class="flow-box backend">
+                            <div class="icon">⚙️</div>
+                            <div class="label">后端</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-connector">
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-label">SQL查询</span>
+                    </div>
+                    
+                    <div class="flow-node">
+                        <div class="flow-box database">
+                            <div class="icon">🗄️</div>
+                            <div class="label">数据库</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-detail">
+                <div class="flow-step-detail">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <span class="step-meta request">用户操作</span>
+                        <h4>用户在界面上的操作</h4>
+                        <p>用户点击按钮、填写表单、滑动页面等操作触发数据请求。这是数据流转的起点，前端会捕获这些交互事件。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <span class="step-meta request">请求发送</span>
+                        <h4>前端发送 HTTP 请求</h4>
+                        <p>前端将用户操作转化为 HTTP 请求（GET/POST/PUT/DELETE），包含请求参数、Header 信息等，发送到后端服务器。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <span class="step-meta process">业务处理</span>
+                        <h4>后端处理业务逻辑</h4>
+                        <p>后端接收请求后进行身份验证、权限检查、业务规则校验，决定如何处理这个请求。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <span class="step-meta process">数据操作</span>
+                        <h4>数据库查询或写入</h4>
+                        <p>后端通过 SQL 语句与数据库交互，可能是查询商品信息、创建订单记录、更新用户资料等操作。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <span class="step-meta response">响应返回</span>
+                        <h4>后端返回处理结果</h4>
+                        <p>后端将处理结果（成功/失败）和数据封装成响应，通过 HTTP 返回给前端。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <span class="step-meta response">界面更新</span>
+                        <h4>前端渲染展示</h4>
+                        <p>前端解析响应数据，更新页面内容，给用户展示结果。可能是跳转页面、显示数据或弹出提示。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>💡 产品经理的关注点</h4>
+                <ul>
+                    <li><strong>数据从哪来</strong>：页面展示的数据需要调用哪些接口获取？</li>
+                    <li><strong>数据到哪去</strong>：用户提交的数据要存储到哪里？</li>
+                    <li><strong>异常怎么办</strong>：网络失败、服务器错误时如何提示用户？</li>
+                    <li><strong>加载状态</strong>：数据请求期间页面应该显示什么？</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第二节：请求与响应 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📡</span>
+                请求与响应：数据的"一问一答"
+            </h2>
+
+            <p>
+                HTTP 协议是前后端通信的基础，采用"请求-响应"模式。就像你向服务员点餐（请求），服务员把菜端上来（响应）。
+            </p>
+
+            <h3>一个完整的请求包含什么？</h3>
+
+            <div class="packet-visual">
+                <div class="packet-header">
+                    <span class="packet-type">REQUEST</span>
+                    <span class="packet-title">获取商品详情</span>
+                </div>
+                <div class="packet-content">
+<span class="key">GET</span> /api/products/<span class="string">SKU12345</span> <span class="key">HTTP/1.1</span><br>
+<span class="key">Host</span>: api.example.com<br>
+<span class="key">Authorization</span>: Bearer token123...<br>
+<span class="key">Content-Type</span>: application/json<br><br>
+<span class="key">Query Parameters</span>:<br>
+{
+&nbsp;&nbsp;<span class="string">"includeReviews"</span>: <span class="number">true</span>,
+&nbsp;&nbsp;<span class="string">"region"</span>: <span class="string">"CN"</span>
+}
+                </div>
+            </div>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="concept-icon">🔗</div>
+                    <h4>请求方法</h4>
+                    <p>GET（获取）、POST（创建）、PUT（更新）、DELETE（删除），表示对资源的操作类型</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📍</div>
+                    <h4>请求路径</h4>
+                    <p>标识资源的唯一地址，如 /api/users/123 表示 ID 为 123 的用户</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📋</div>
+                    <h4>请求头</h4>
+                    <p>包含身份认证、数据格式、设备信息等元数据</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📦</div>
+                    <h4>请求体</h4>
+                    <p>POST/PUT 请求中携带的具体数据，如表单内容、JSON 对象</p>
+                </div>
+            </div>
+
+            <h3>响应数据长什么样？</h3>
+
+            <div class="packet-visual">
+                <div class="packet-header">
+                    <span class="packet-type response">RESPONSE</span>
+                    <span class="packet-title">商品详情响应</span>
+                </div>
+                <div class="packet-content">
+<span class="key">HTTP/1.1</span> <span class="number">200</span> OK<br>
+<span class="key">Content-Type</span>: application/json<br><br>
+{
+&nbsp;&nbsp;<span class="string">"code"</span>: <span class="number">200</span>,
+&nbsp;&nbsp;<span class="string">"data"</span>: {
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"productId"</span>: <span class="string">"SKU12345"</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"name"</span>: <span class="string">"无线蓝牙耳机"</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"price"</span>: <span class="number">299.00</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"stock"</span>: <span class="number">156</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"images"</span>: [<span class="string">"url1"</span>, <span class="string">"url2"</span>]
+&nbsp;&nbsp;},
+&nbsp;&nbsp;<span class="string">"message"</span>: <span class="string">"success"</span>
+}
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>📊 常见状态码</h4>
+                <ul>
+                    <li><strong>200</strong> - 成功：请求处理完成，数据正常返回</li>
+                    <li><strong>400</strong> - 错误请求：参数格式错误或缺少必填项</li>
+                    <li><strong>401</strong> - 未授权：需要登录或 Token 失效</li>
+                    <li><strong>403</strong> - 禁止访问：没有权限执行此操作</li>
+                    <li><strong>404</strong> - 未找到：请求的资源不存在</li>
+                    <li><strong>500</strong> - 服务器错误：后端程序出现异常</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第三节：常见数据流转场景 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎯</span>
+                常见数据流转场景
+            </h2>
+
+            <p>
+                不同功能背后的数据流转逻辑各不相同。了解这些典型场景，能帮助你在设计功能时考虑更周全。
+            </p>
+
+            <div class="scenario-grid">
+                <div class="scenario-card">
+                    <div class="scenario-icon">🔍</div>
+                    <h4>搜索查询</h4>
+                    <p>用户输入关键词 → 前端传递搜索参数 → 后端查询匹配数据 → 返回结果列表</p>
+                </div>
+                <div class="scenario-card">
+                    <div class="scenario-icon">📝</div>
+                    <h4>表单提交</h4>
+                    <p>用户填写表单 → 前端验证格式 → 后端校验业务规则 → 写入数据库 → 返回成功状态</p>
+                </div>
+                <div class="scenario-card">
+                    <div class="scenario-icon">📄</div>
+                    <h4>列表分页</h4>
+                    <p>用户滚动/点击翻页 → 前端请求下一页数据 → 后端查询指定范围 → 返回分页结果</p>
+                </div>
+                <div class="scenario-card">
+                    <div class="scenario-icon">🔔</div>
+                    <h4>实时通知</h4>
+                    <p>后端事件发生 → 推送消息 → 前端接收 → 更新消息角标或弹出提示</p>
+                </div>
+            </div>
+
+            <h3>场景详解：商品搜索</h3>
+
+            <div class="case-study">
+                <div class="case-header">
+                    <div class="case-icon">🛍️</div>
+                    <div class="case-title-wrap">
+                        <h4>电商商品搜索功能</h4>
+                        <span>从输入关键词到展示结果的数据流转</span>
+                    </div>
+                </div>
+
+                <div class="case-flow">
+                    <div class="case-step">
+                        <div class="case-step-icon">✏️</div>
+                        <div class="case-step-label">输入关键词</div>
+                        <div class="case-step-role">用户</div>
+                    </div>
+                    <div class="case-step">
+                        <div class="case-step-icon">⏱️</div>
+                        <div class="case-step-label">防抖处理</div>
+                        <div class="case-step-role">前端</div>
+                    </div>
+                    <div class="case-step">
+                        <div class="case-step-icon">📡</div>
+                        <div class="case-step-label">发起请求</div>
+                        <div class="case-step-role">前端</div>
+                    </div>
+                    <div class="case-step">
+                        <div class="case-step-icon">🔎</div>
+                        <div class="case-step-label">搜索匹配</div>
+                        <div class="case-step-role">后端</div>
+                    </div>
+                    <div class="case-step">
+                        <div class="case-step-icon">📋</div>
+                        <div class="case-step-label">展示结果</div>
+                        <div class="case-step-role">前端</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>⚠️ 搜索功能的注意点</h4>
+                <ul>
+                    <li><strong>防抖处理</strong>：用户连续输入时不每次都请求，等停止输入后再发起</li>
+                    <li><strong>Loading 状态</strong>：搜索期间显示加载动画，避免用户以为卡顿</li>
+                    <li><strong>空状态处理</strong>：无结果时展示友好提示，推荐相似商品</li>
+                    <li><strong>结果缓存</strong>：相同关键词短期内不再请求，提升体验</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第四节：数据安全与异常 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🔐</span>
+                数据安全与异常处理
+            </h2>
+
+            <p>
+                数据流转过程中可能遇到各种问题：网络中断、服务器繁忙、数据格式错误等。良好的异常处理机制能提升用户体验。
+            </p>
+
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <div class="concept-icon">🔒</div>
+                    <h4>身份验证</h4>
+                    <p>Token、Session、Cookie 等机制确保只有合法用户能访问数据</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">✅</div>
+                    <h4>数据校验</h4>
+                    <p>前端做格式校验（即时反馈），后端做业务校验（最终把关）</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🔄</div>
+                    <h4>失败重试</h4>
+                    <p>网络超时自动重试，但要限制次数避免死循环</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <h4>限流保护</h4>
+                    <p>防止恶意请求，如短信验证码接口限制每分钟调用次数</p>
+                </div>
+            </div>
+
+            <h3>异常场景处理清单</h3>
+
+            <div class="flow-detail">
+                <div class="flow-step-detail">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>网络异常（无网络/弱网）</h4>
+                        <p>提示用户检查网络连接，提供重试按钮。已填写的内容不能丢失。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>请求超时</h4>
+                        <p>显示"请求超时"提示，让用户选择重试或取消。避免无限等待。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>服务器错误（500）</h4>
+                        <p>友好提示"服务繁忙，请稍后再试"，记录日志供开发排查。</p>
+                    </div>
+                </div>
+                <div class="flow-step-detail">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>数据格式错误（400）</h4>
+                        <p>精确定位哪个字段有问题，如"手机号格式不正确"。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>💡 产品经理验收 checklist</h4>
+                <ul>
+                    <li>正常流程：数据是否正确显示，操作是否流畅？</li>
+                    <li>Loading 状态：等待期间是否有加载提示？</li>
+                    <li>空数据状态：没有数据时页面如何展示？</li>
+                    <li>错误提示：各种异常情况是否有友好的错误提示？</li>
+                    <li>边界情况：超长文本、特殊字符、大量数据时的表现？</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 交互式学习组件：数据流转动画演示器 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎬</span>
+                互动演示：数据流转动画
+            </h2>
+            
+            <p>
+                选择一个业务场景，观看数据从用户操作到界面更新的完整流转过程。每个步骤都会高亮显示，帮助你直观理解数据在各层间的传递。
+            </p>
+            
+            <div style="background: var(--bg-primary); border-radius: 16px; padding: 28px; margin-top: 24px;">
+                <!-- 场景选择 -->
+                <div style="margin-bottom: 24px;">
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; text-align: center;">选择业务场景</div>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <button class="flow-scenario-btn active" data-scenario="search" style="padding: 10px 20px; background: var(--bg-secondary); border: 2px solid var(--accent); border-radius: 20px; font-size: 14px; color: var(--accent); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            🔍 商品搜索
+                        </button>
+                        <button class="flow-scenario-btn" data-scenario="login" style="padding: 10px 20px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: 20px; font-size: 14px; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                            🔐 用户登录
+                        </button>
+                        <button class="flow-scenario-btn" data-scenario="pay" style="padding: 10px 20px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: 20px; font-size: 14px; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                            💳 订单支付
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 流转动画区域 -->
+                <div style="background: var(--bg-secondary); border-radius: 16px; padding: 32px 24px; position: relative; overflow: hidden;">
+                    <!-- 背景连接线 -->
+                    <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.3;">
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:var(--accent);stop-opacity:0" />
+                                <stop offset="50%" style="stop-color:var(--accent);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:var(--accent);stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    
+                    <!-- 流程节点 -->
+                    <div class="flow-nodes" style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+                        <!-- 节点1: 用户 -->
+                        <div class="flow-node" data-node="user" style="flex: 1; text-align: center; transition: all 0.3s; transform: scale(1);">
+                            <div class="node-icon" style="width: 72px; height: 72px; background: var(--bg-primary); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid var(--border-light); transition: all 0.3s;">
+                                👤
+                            </div>
+                            <div class="node-title" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">用户</div>
+                            <div class="node-status" style="font-size: 12px; color: var(--text-muted);">等待操作</div>
+                        </div>
+                        
+                        <!-- 连接线1 -->
+                        <div style="flex: 0.5; display: flex; align-items: center; justify-content: center;">
+                            <div class="flow-arrow" style="width: 60px; height: 2px; background: var(--border-light); position: relative; transition: all 0.3s;">
+                                <div class="arrow-packet" style="position: absolute; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; top: -5px; left: -12px; opacity: 0; transition: all 0.3s;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 节点2: 前端 -->
+                        <div class="flow-node" data-node="frontend" style="flex: 1; text-align: center; transition: all 0.3s; transform: scale(1);">
+                            <div class="node-icon" style="width: 72px; height: 72px; background: var(--bg-primary); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid var(--border-light); transition: all 0.3s;">
+                                📱
+                            </div>
+                            <div class="node-title" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">前端</div>
+                            <div class="node-status" style="font-size: 12px; color: var(--text-muted);">待命</div>
+                        </div>
+                        
+                        <!-- 连接线2 -->
+                        <div style="flex: 0.5; display: flex; align-items: center; justify-content: center;">
+                            <div class="flow-arrow" style="width: 60px; height: 2px; background: var(--border-light); position: relative; transition: all 0.3s;">
+                                <div class="arrow-packet" style="position: absolute; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; top: -5px; left: -12px; opacity: 0; transition: all 0.3s;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 节点3: 后端 -->
+                        <div class="flow-node" data-node="backend" style="flex: 1; text-align: center; transition: all 0.3s; transform: scale(1);">
+                            <div class="node-icon" style="width: 72px; height: 72px; background: var(--bg-primary); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid var(--border-light); transition: all 0.3s;">
+                                ⚙️
+                            </div>
+                            <div class="node-title" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">后端</div>
+                            <div class="node-status" style="font-size: 12px; color: var(--text-muted);">待命</div>
+                        </div>
+                        
+                        <!-- 连接线3 -->
+                        <div style="flex: 0.5; display: flex; align-items: center; justify-content: center;">
+                            <div class="flow-arrow" style="width: 60px; height: 2px; background: var(--border-light); position: relative; transition: all 0.3s;">
+                                <div class="arrow-packet" style="position: absolute; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; top: -5px; left: -12px; opacity: 0; transition: all 0.3s;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 节点4: 数据库 -->
+                        <div class="flow-node" data-node="database" style="flex: 1; text-align: center; transition: all 0.3s; transform: scale(1);">
+                            <div class="node-icon" style="width: 72px; height: 72px; background: var(--bg-primary); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid var(--border-light); transition: all 0.3s;">
+                                🗄️
+                            </div>
+                            <div class="node-title" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">数据库</div>
+                            <div class="node-status" style="font-size: 12px; color: var(--text-muted);">待命</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 详细信息面板 -->
+                    <div id="flowDetailPanel" style="margin-top: 24px; background: var(--bg-code); border-radius: 12px; padding: 20px; border-left: 4px solid var(--info);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 18px;">ℹ️</span>
+                            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">当前步骤</span>
+                        </div>
+                        <div id="flowDetailText" style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
+                            点击下方按钮开始演示数据流转过程
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 控制按钮 -->
+                <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: center;">
+                    <button id="startFlowAnimation" style="padding: 12px 32px; background: var(--accent); color: white; border: none; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+                        <span>▶️</span> 开始演示
+                    </button>
+                    <button id="resetFlowAnimation" style="padding: 12px 32px; background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-light); border-radius: 24px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                        🔄 重置
+                    </button>
+                </div>
+            </div>
+            
+            <div class="highlight-box" style="margin-top: 24px;">
+                <h4>💡 数据流转关键点</h4>
+                <ul>
+                    <li><strong>请求阶段</strong>：数据从用户 → 前端 → 后端 → 数据库</li>
+                    <li><strong>响应阶段</strong>：数据从数据库 → 后端 → 前端 → 用户</li>
+                    <li><strong>耗时点</strong>：网络传输、数据库查询、业务逻辑处理</li>
+                    <li><strong>优化方向</strong>：减少请求次数、缓存热点数据、异步处理</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 底部留白 -->
+        <div class="page-end-spacer"></div>
+    </main>
+
+    <!-- 底部操作栏 -->
+    <div class="lesson-footer-bar">
+        <div class="footer-bar-content">
+            <div class="footer-nav">
+                <a href="lesson-1-2-detail.html" class="btn-nav">← 上一课</a>
+                <a href="phase1-detail.html" class="btn-nav">课程列表</a>
+            </div>
+            <button class="btn-complete" onclick="markComplete()">
+                <span>✓</span>
+                <span>标记为已完成</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 进度追踪
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollProgress = Math.round((scrollTop / docHeight) * 100);
+            
+            document.getElementById('progressFill').style.width = scrollProgress + '%';
+            document.getElementById('progressText').textContent = scrollProgress + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+        
+        // 标记完成
+        function markComplete() {
+            const btn = document.querySelector('.btn-complete');
+            btn.innerHTML = '<span>✓</span><span>已完成</span>';
+            btn.style.background = '#389E0D';
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+            
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = '100%';
+            
+            setTimeout(() => {
+                alert('恭喜完成本课程！🎉');
+            }, 300);
+        }
+        
+        // 初始化
+        updateProgress();
+        
+        // ========== 数据流转动画演示器 ==========
+        const flowScenarios = {
+            search: {
+                name: '商品搜索',
+                steps: [
+                    { node: 'user', action: '用户输入关键词', detail: '在搜索框输入"无线耳机"，点击搜索按钮' },
+                    { node: 'frontend', action: '前端发送请求', detail: '防抖处理后，发送 GET /api/products?keyword=无线耳机' },
+                    { node: 'backend', action: '后端处理请求', detail: '验证参数、调用搜索服务' },
+                    { node: 'database', action: '数据库查询', detail: 'SELECT * FROM products WHERE name LIKE "%无线耳机%"' },
+                    { node: 'backend', action: '后端返回结果', detail: '格式化数据，返回商品列表（20条）' },
+                    { node: 'frontend', action: '前端渲染列表', detail: '更新DOM，展示搜索结果' },
+                    { node: 'user', action: '用户查看结果', detail: '浏览商品列表，点击感兴趣的商view品' }
+                ]
+            },
+            login: {
+                name: '用户登录',
+                steps: [
+                    { node: 'user', action: '用户输入验证码', detail: '输入手机号收到的验证码"123456"' },
+                    { node: 'frontend', action: '前端发送请求', detail: 'POST /api/auth/login { phone, code }' },
+                    { node: 'backend', action: '后端验证', detail: '检查验证码是否正确、是否过期' },
+                    { node: 'database', action: '数据库查询用户', detail: '查询用户信息，不存在则创建新用户' },
+                    { node: 'backend', action: '生成Token', detail: '创建JWT Token，设置过期时间7天' },
+                    { node: 'frontend', action: '前端保存Token', detail: '存储到LocalStorage，更新登录状态' },
+                    { node: 'user', action: '用户进入首页', detail: '自动跳转到首页，显示用户信息' }
+                ]
+            },
+            pay: {
+                name: '订单支付',
+                steps: [
+                    { node: 'user', action: '用户点击支付', detail: '选择支付方式（微信/支付宝），确认支付' },
+                    { node: 'frontend', action: '前端发送请求', detail: 'POST /api/orders/{id}/pay { payMethod }' },
+                    { node: 'backend', action: '创建支付单', detail: '调用支付平台API，生成预支付订单' },
+                    { node: 'database', action: '数据库更新', detail: '更新订单状态为"支付中"' },
+                    { node: 'backend', action: '返回支付参数', detail: '返回支付平台需要的参数' },
+                    { node: 'frontend', action: '唤起支付', detail: '调起微信/支付宝支付SDK' },
+                    { node: 'user', action: '用户完成支付', detail: '在支付平台确认支付，输入密码' }
+                ]
+            }
+        };
+        
+        let currentScenario = 'search';
+        let animationTimer = null;
+        let currentStepIndex = -1;
+        let isAnimating = false;
+        
+        // 场景切换
+        document.querySelectorAll('.flow-scenario-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (isAnimating) return;
+                currentScenario = this.dataset.scenario;
+                document.querySelectorAll('.flow-scenario-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'transparent';
+                    b.style.color = 'var(--text-secondary)';
+                    b.style.fontWeight = '500';
+                });
+                this.classList.add('active');
+                this.style.borderColor = 'var(--accent)';
+                this.style.color = 'var(--accent)';
+                this.style.fontWeight = '600';
+                
+                resetFlowAnimation();
+                document.getElementById('flowDetailText').textContent = `已选择「${flowScenarios[currentScenario].name}」场景，点击"开始演示"`;
+            });
+        });
+        
+        // 开始动画
+        document.getElementById('startFlowAnimation').addEventListener('click', function() {
+            if (isAnimating) return;
+            playFlowAnimation();
+        });
+        
+        // 重置动画
+        document.getElementById('resetFlowAnimation').addEventListener('click', resetFlowAnimation);
+        
+        async function playFlowAnimation() {
+            isAnimating = true;
+            const steps = flowScenarios[currentScenario].steps;
+            const startBtn = document.getElementById('startFlowAnimation');
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.6';
+            startBtn.style.cursor = 'not-allowed';
+            
+            for (let i = 0; i < steps.length; i++) {
+                currentStepIndex = i;
+                const step = steps[i];
+                
+                // 高亮节点
+                highlightFlowNode(step.node);
+                
+                // 更新详情面板
+                const panel = document.getElementById('flowDetailPanel');
+                panel.style.borderLeftColor = getNodeColor(step.node);
+                document.getElementById('flowDetailText').innerHTML = `
+                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">${step.action}</div>
+                    <div style="color: var(--text-secondary);">${step.detail}</div>
+                    <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">步骤 ${i + 1}/${steps.length}</div>
+                `;
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            // 完成动画
+            document.getElementById('flowDetailText').innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 28px; margin-bottom: 8px;">✅</div>
+                    <div style="font-weight: 600; color: var(--success);">数据流转完成</div>
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">整个过程约 ${steps.length} 步，实际耗时通常在 200-500ms</div>
+                </div>
+            `;
+            
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            startBtn.style.cursor = 'pointer';
+            isAnimating = false;
+        }
+        
+        function highlightFlowNode(nodeName) {
+            // 重置所有节点
+            document.querySelectorAll('.flow-node').forEach(node => {
+                const icon = node.querySelector('.node-icon');
+                icon.style.borderColor = 'var(--border-light)';
+                icon.style.transform = 'scale(1)';
+                icon.style.boxShadow = 'none';
+                node.querySelector('.node-status').textContent = '待命';
+                node.querySelector('.node-status').style.color = 'var(--text-muted)';
+            });
+            
+            // 高亮目标节点
+            const targetNode = document.querySelector(`.flow-node[data-node="${nodeName}"]`);
+            if (targetNode) {
+                const icon = targetNode.querySelector('.node-icon');
+                icon.style.borderColor = 'var(--accent)';
+                icon.style.transform = 'scale(1.1)';
+                icon.style.boxShadow = '0 4px 20px rgba(232, 111, 81, 0.3)';
+                targetNode.querySelector('.node-status').textContent = '处理中';
+                targetNode.querySelector('.node-status').style.color = 'var(--accent)';
+            }
+        }
+        
+        function getNodeColor(node) {
+            const colors = {
+                'user': 'var(--info)',
+                'frontend': 'var(--warning)',
+                'backend': 'var(--accent)',
+                'database': 'var(--success)'
+            };
+            return colors[node] || 'var(--info)';
+        }
+        
+        function resetFlowAnimation() {
+            isAnimating = false;
+            currentStepIndex = -1;
+            
+            if (animationTimer) {
+                clearTimeout(animationTimer);
+                animationTimer = null;
+            }
+            
+            // 重置所有节点
+            document.querySelectorAll('.flow-node').forEach(node => {
+                const icon = node.querySelector('.node-icon');
+                icon.style.borderColor = 'var(--border-light)';
+                icon.style.transform = 'scale(1)';
+                icon.style.boxShadow = 'none';
+                node.querySelector('.node-status').textContent = '待命';
+                node.querySelector('.node-status').style.color = 'var(--text-muted)';
+            });
+            
+            // 重置详情面板
+            const panel = document.getElementById('flowDetailPanel');
+            panel.style.borderLeftColor = 'var(--info)';
+            document.getElementById('flowDetailText').textContent = '点击下方按钮开始演示数据流转过程';
+            
+            // 重置按钮
+            const startBtn = document.getElementById('startFlowAnimation');
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            startBtn.style.cursor = 'pointer';
+        }
+        
+        // 初始化默认场景
+        document.querySelector('.flow-scenario-btn[data-scenario="search"]').classList.add('active');
+    </script>
+</body>
+</html>

@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阶段四：实战项目演练 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        /* 阶段头部 */
+        .phase-header {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(250, 173, 20, 0.1);
+            color: var(--warning);
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+
+        .phase-illustration {
+            width: 160px;
+            height: 140px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 16px 32px rgba(232, 111, 81, 0.2);
+        }
+
+        .phase-illustration::before {
+            content: '🚀';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px;
+        }
+
+        .phase-illustration::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: var(--bg-primary);
+            border: 3px solid var(--text-primary);
+            border-radius: 50%;
+            box-shadow: 0 3px 0 var(--text-primary);
+        }
+
+        .phase-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .phase-header p {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* 进度总览卡片 */
+        .progress-overview {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--warning);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .progress-bar-wrap {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--warning) 0%, var(--accent-light) 100%);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 项目类型介绍 */
+        .project-types-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .project-types-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .project-type-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .project-type-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .project-type-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 16px;
+        }
+
+        .project-type-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .project-type-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 项目列表 */
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .section-title-wrap h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .project-list {
+            margin-bottom: 60px;
+        }
+
+        .project-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* 可点击视觉引导 */
+        .project-card::after {
+            content: '→';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            font-size: 20px;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .project-card:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+            color: var(--accent);
+        }
+
+        /* 悬停时标题高亮 */
+        .project-card:hover .project-info h3 {
+            color: var(--accent);
+        }
+
+        /* 键盘焦点状态 */
+        .project-card:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.3);
+        }
+
+        .project-card:active {
+            transform: translateY(0) scale(0.99);
+        }
+
+        /* 锁定状态的卡片降低箭头提示 */
+        .project-card.locked::after {
+            opacity: 0.3;
+        }
+
+        .project-card.completed {
+            border-left: 4px solid var(--success);
+        }
+
+        .project-card.active {
+            border-left: 4px solid var(--warning);
+        }
+
+        .project-card.locked {
+            opacity: 0.7;
+        }
+
+        .project-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .project-number {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .project-card.completed .project-number {
+            background: var(--success);
+            color: white;
+        }
+
+        .project-card.active .project-number {
+            background: var(--warning);
+            color: white;
+        }
+
+        .project-info {
+            flex: 1;
+        }
+
+        .project-info h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .project-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .project-desc {
+            padding-left: 60px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .project-deliverables {
+            padding-left: 60px;
+            margin-bottom: 16px;
+        }
+
+        .deliverable-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .deliverable-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .project-footer {
+            padding-left: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-tag {
+            padding: 5px 12px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .project-tag.accent {
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+        }
+
+        .project-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: rgba(82, 196, 26, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.active {
+            background: rgba(250, 173, 20, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.locked {
+            background: var(--bg-primary);
+            color: var(--text-muted);
+        }
+
+        .btn-review, .btn-continue, .btn-start {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-review {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+
+        .btn-review:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-continue, .btn-start {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-continue:hover, .btn-start:hover {
+            background: #D48806;
+            transform: translateY(-1px);
+        }
+
+        /* 团队协作模块 */
+        .team-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .team-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .team-role-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team-role-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .team-role-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+
+        .team-role-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .team-role-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* 学习说明 */
+        .info-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .info-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 14px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .info-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* 核心技能 */
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .skill-item h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .skill-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 时间线 */
+        .timeline-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .timeline-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--bg-primary);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+        }
+
+        .timeline-item.completed::before {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .timeline-item.active::before {
+            background: var(--warning);
+            border-color: var(--warning);
+        }
+
+        .timeline-item h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 下一阶段预览 */
+        .next-phase {
+            background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(115, 209, 61, 0.05) 100%);
+            border: 2px dashed var(--success);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .next-phase-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .next-phase h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .next-phase p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .btn-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: var(--success);
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-next:hover {
+            background: #389E0D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(82, 196, 26, 0.3);
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--footer-bg);
+            padding: 48px 24px 40px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo span:first-child {
+            color: var(--accent);
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--footer-text);
+            line-height: 1.8;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .phase-header h1 {
+                font-size: 28px;
+            }
+
+            .progress-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .project-desc,
+            .project-deliverables,
+            .project-footer {
+                padding-left: 0;
+            }
+
+            .project-header {
+                margin-bottom: 16px;
+            }
+
+            .project-footer {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .project-type-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .skill-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.15s; }
+        .project-card:nth-child(3) { animation-delay: 0.2s; }
+        .project-card:nth-child(4) { animation-delay: 0.25s; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="pm-tech-learning.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <a href="pm-tech-learning.html" class="back-link">
+                <span>←</span>
+                <span>返回学习路径</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 阶段头部 -->
+        <section class="phase-header">
+            <div class="phase-badge">
+                <span>◉</span>
+                <span>进行中</span>
+            </div>
+            <div class="phase-illustration"></div>
+            <h1>阶段四：实战项目演练</h1>
+            <p>通过真实项目案例，将所学技术知识转化为实际工作能力。在模拟项目环境中锻炼技术决策、方案设计和团队协作能力。</p>
+        </section>
+
+        <!-- 进度总览 -->
+        <section class="progress-overview">
+            <div class="progress-header">
+                <h2 class="progress-title">项目进度</h2>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">0/4</div>
+                        <div class="stat-label">项目完成</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">交付物</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">预计课时</div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+            </div>
+            <div class="progress-meta">
+                <span>🚀 准备好迎接真实项目挑战了吗？</span>
+                <span>预计完成时间：4周</span>
+            </div>
+        </section>
+
+        <!-- 项目类型介绍 -->
+        <section class="project-types-section">
+            <h3><span>📂</span> 项目类型概览</h3>
+            <div class="project-type-grid">
+                <div class="project-type-card">
+                    <div class="project-type-icon">🛒</div>
+                    <h4>电商平台</h4>
+                    <p>商品管理、订单系统、支付流程、库存管理</p>
+                </div>
+                <div class="project-type-card">
+                    <div class="project-type-icon">👥</div>
+                    <h4>社交应用</h4>
+                    <p>用户关系、内容发布、消息通知、feed流</p>
+                </div>
+                <div class="project-type-card">
+                    <div class="project-type-icon">📊</div>
+                    <h4>数据产品</h4>
+                    <p>数据采集、可视化看板、报表系统、指标定义</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 项目列表 -->
+        <section class="project-list">
+            <div class="section-title-wrap">
+                <div class="section-icon">🎯</div>
+                <h2>实战项目</h2>
+            </div>
+
+            <!-- 项目 1 -->
+            <div class="project-card active" data-project-id="project-4-1" data-project-url="project-4-1-detail.html" tabindex="0" role="button">
+                <div class="project-header">
+                    <div class="project-number">1</div>
+                    <div class="project-info">
+                        <h3>4.1 电商订单系统重构</h3>
+                        <div class="project-meta">
+                            <span>⏱ 3周</span>
+                            <span>👥 团队协作</span>
+                            <span>📦 核心项目</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="project-desc">以实际电商订单系统为案例，从需求分析到技术方案设计，完整体验产品迭代全流程。包含订单状态机设计、库存扣减策略、异常处理机制等核心模块。</p>
+                <div class="project-deliverables">
+                    <div class="deliverable-list">
+                        <span class="deliverable-item">📄 PRD文档</span>
+                        <span class="deliverable-item">🗄️ 数据模型设计</span>
+                        <span class="deliverable-item">🔌 接口规范</span>
+                        <span class="deliverable-item">📋 测试用例</span>
+                    </div>
+                </div>
+                <div class="project-footer">
+                    <div class="project-tags">
+                        <span class="project-tag">订单系统</span>
+                        <span class="project-tag">状态机</span>
+                        <span class="project-tag accent">核心项目</span>
+                    </div>
+                    <div class="project-status">
+                        <span class="status-badge active">● 进行中</span>
+                        <button class="btn-start" data-project-url="project-4-1-detail.html">开始项目</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目 2 -->
+            <div class="project-card locked" data-project-id="project-4-2" data-project-url="project-4-2-detail.html" tabindex="0" role="button">
+                <div class="project-header">
+                    <div class="project-number">2</div>
+                    <div class="project-info">
+                        <h3>4.2 用户权限管理系统</h3>
+                        <div class="project-meta">
+                            <span>⏱ 2周</span>
+                            <span>👤 独立完成</span>
+                            <span>🔐 安全相关</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="project-desc">设计一套完整的 RBAC（基于角色的访问控制）系统。涵盖用户-角色-权限三层模型、数据权限隔离、操作日志记录等企业级功能。</p>
+                <div class="project-deliverables">
+                    <div class="deliverable-list">
+                        <span class="deliverable-item">📄 权限模型设计</span>
+                        <span class="deliverable-item">🔄 权限流转图</span>
+                        <span class="deliverable-item">📝 接口文档</span>
+                    </div>
+                </div>
+                <div class="project-footer">
+                    <div class="project-tags">
+                        <span class="project-tag">RBAC</span>
+                        <span class="project-tag">权限控制</span>
+                        <span class="project-tag">数据安全</span>
+                    </div>
+                    <div class="project-status">
+                        <span class="status-badge locked">🔒 未解锁</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目 3 -->
+            <div class="project-card locked" data-project-id="project-4-3" data-project-url="project-4-3-detail.html" tabindex="0" role="button">
+                <div class="project-header">
+                    <div class="project-number">3</div>
+                    <div class="project-info">
+                        <h3>4.3 实时消息推送系统</h3>
+                        <div class="project-meta">
+                            <span>⏱ 2周</span>
+                            <span>👥 团队协作</span>
+                            <span>⚡ 高并发</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="project-desc">设计支持百万级用户的实时消息推送方案。涉及消息队列选型、推送策略、离线消息处理、多端同步等复杂场景的技术决策。</p>
+                <div class="project-deliverables">
+                    <div class="deliverable-list">
+                        <span class="deliverable-item">📐 系统架构图</span>
+                        <span class="deliverable-item">📊 性能评估报告</span>
+                        <span class="deliverable-item">🚀 技术选型方案</span>
+                    </div>
+                </div>
+                <div class="project-footer">
+                    <div class="project-tags">
+                        <span class="project-tag">消息队列</span>
+                        <span class="project-tag">WebSocket</span>
+                        <span class="project-tag accent">高并发</span>
+                    </div>
+                    <div class="project-status">
+                        <span class="status-badge locked">🔒 未解锁</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目 4 -->
+            <div class="project-card locked" data-project-id="project-4-4" data-project-url="project-4-4-detail.html" tabindex="0" role="button">
+                <div class="project-header">
+                    <div class="project-number">4</div>
+                    <div class="project-info">
+                        <h3>4.4 数据可视化大屏</h3>
+                        <div class="project-meta">
+                            <span>⏱ 3周</span>
+                            <span>👤 独立完成</span>
+                            <span>📈 毕业项目</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="project-desc">综合运用本阶段全部技能，设计一套业务数据监控大屏。从数据采集、存储、计算到展示的全链路方案设计，作为阶段毕业作品。</p>
+                <div class="project-deliverables">
+                    <div class="deliverable-list">
+                        <span class="deliverable-item">🎨 产品原型</span>
+                        <span class="deliverable-item">🗄️ 数据仓库设计</span>
+                        <span class="deliverable-item">📊 可视化方案</span>
+                        <span class="deliverable-item">📑 项目总结报告</span>
+                    </div>
+                </div>
+                <div class="project-footer">
+                    <div class="project-tags">
+                        <span class="project-tag">数据产品</span>
+                        <span class="project-tag">可视化</span>
+                        <span class="project-tag accent">毕业项目</span>
+                    </div>
+                    <div class="project-status">
+                        <span class="status-badge locked">🔒 未解锁</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 团队协作 -->
+        <section class="team-section">
+            <h3><span>👥</span> 项目团队角色</h3>
+            <div class="team-grid">
+                <div class="team-role-card">
+                    <div class="team-role-icon">🎯</div>
+                    <h4>产品经理</h4>
+                    <p>需求定义与优先级</p>
+                </div>
+                <div class="team-role-card">
+                    <div class="team-role-icon">💻</div>
+                    <h4>前端开发</h4>
+                    <p>界面实现与交互</p>
+                </div>
+                <div class="team-role-card">
+                    <div class="team-role-icon">⚙️</div>
+                    <h4>后端开发</h4>
+                    <p>业务逻辑与接口</p>
+                </div>
+                <div class="team-role-card">
+                    <div class="team-role-icon">🗄️</div>
+                    <h4>数据工程师</h4>
+                    <p>数据建模与存储</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 项目时间线 -->
+        <section class="timeline-section">
+            <h3><span>📅</span> 项目里程碑</h3>
+            <div class="timeline">
+                <div class="timeline-item active">
+                    <h4>Week 1: 需求分析与技术调研</h4>
+                    <p>理解业务需求，进行技术方案预研和可行性评估</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Week 2: 方案设计与评审</h4>
+                    <p>输出完整技术方案，组织技术评审会议</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Week 3: 详细设计与文档</h4>
+                    <p>完成数据模型、接口规范、测试方案等详细设计</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>Week 4: 项目交付与复盘</h4>
+                    <p>提交项目交付物，进行项目复盘与经验总结</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学习说明 -->
+        <section class="info-section">
+            <h3><span>💡</span> 本阶段你将掌握</h3>
+            <ul class="info-list">
+                <li>独立完成中型技术项目的需求分析和技术方案设计</li>
+                <li>掌握技术选型的方法论，能够权衡各种技术方案的优劣</li>
+                <li>学会编写规范的技术文档（PRD、技术方案、接口文档）</li>
+                <li>具备与开发团队进行深度技术讨论和方案评审的能力</li>
+                <li>理解项目全生命周期管理，能够识别和管控技术风险</li>
+                <li>建立产品思维与技术思维的桥梁，成为懂技术的产品经理</li>
+            </ul>
+        </section>
+
+        <!-- 核心技能 -->
+        <section class="info-section">
+            <h3><span>🎯</span> 核心技能目标</h3>
+            <div class="skill-grid">
+                <div class="skill-item">
+                    <h4><span>📝</span> 技术方案设计</h4>
+                    <p>能够独立完成系统架构设计，输出清晰的技术方案文档</p>
+                </div>
+                <div class="skill-item">
+                    <h4><span>⚖️</span> 技术选型决策</h4>
+                    <p>掌握技术选型的评估维度，能够做出合理的技术决策</p>
+                </div>
+                <div class="skill-item">
+                    <h4><span>🤝</span> 技术沟通协调</h4>
+                    <p>具备与开发团队高效沟通的能力，能够推动技术方案落地</p>
+                </div>
+                <div class="skill-item">
+                    <h4><span>🔍</span> 技术风险评估</h4>
+                    <p>能够识别项目中的技术风险点，制定相应的应对策略</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 下一阶段 -->
+        <section class="next-phase">
+            <div class="next-phase-icon">🏆</div>
+            <h3>完成所有项目后将获得</h3>
+            <p>恭喜你即将完成 PM Tech Hub 的全部课程！完成阶段四将获得结业证书和项目作品集，为你的职业发展增添有力背书。</p>
+            <a href="#" class="btn-next" style="opacity: 0.5; cursor: not-allowed;">
+                <span>查看结业认证</span>
+                <span>→</span>
+            </a>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>◉</span>
+                <span>PM Tech Hub</span>
+            </div>
+            <p class="footer-copy">
+                © 2024 PM Tech Hub. 专为产品经理打造的技术学习平台。<br>
+                让技术不再成为产品路上的绊脚石
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // 项目配置 - ID与详情页URL映射
+        // ============================================
+        const projectUrls = {
+            'project-4-1': 'project-4-1-detail.html',
+            'project-4-2': 'project-4-2-detail.html',
+            'project-4-3': 'project-4-3-detail.html',
+            'project-4-4': 'project-4-4-detail.html'
+        };
+
+        // 跳转到项目详情页（带项目ID参数）
+        function navigateToProject(projectId) {
+            const url = projectUrls[projectId];
+            if (url) {
+                const targetUrl = `${url}?id=${projectId}`;
+                console.log(`正在跳转到项目: ${projectId}`);
+                window.location.href = targetUrl;
+            } else {
+                console.error(`未找到项目 ${projectId} 的详情页`);
+            }
+        }
+
+        // 进度条动画
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('progressBar').style.width = '0%';
+            }, 300);
+        });
+
+        // 卡片点击效果 - 点击卡片跳转
+        document.querySelectorAll('.project-card[data-project-id]').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 如果点击的是按钮，不触发卡片点击
+                if (e.target.closest('button')) {
+                    return;
+                }
+                
+                const projectId = this.dataset.projectId;
+                const projectUrl = this.dataset.projectUrl;
+                
+                if (projectId && projectUrl) {
+                    // 添加视觉反馈
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        navigateToProject(projectId);
+                    }, 150);
+                }
+            });
+            
+            // 键盘导航支持
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const projectId = this.dataset.projectId;
+                    if (projectId) {
+                        navigateToProject(projectId);
+                    }
+                }
+            });
+        });
+
+        // 开始项目按钮点击
+        document.querySelectorAll('.btn-start[data-project-url]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const projectUrl = this.dataset.projectUrl;
+                const card = this.closest('.project-card');
+                const projectId = card ? card.dataset.projectId : null;
+                
+                if (projectId && projectUrl) {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        navigateToProject(projectId);
+                    }, 100);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

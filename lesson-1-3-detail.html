@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.3 API：数据的搬运工 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .progress-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--bg-code);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-mini-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb .current {
+            color: var(--text-secondary);
+        }
+
+        /* 课程头部 */
+        .lesson-header {
+            margin-bottom: 48px;
+        }
+
+        .lesson-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .lesson-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--accent);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
+        .lesson-type {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lesson-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .lesson-intro {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 680px;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .content-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-primary);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.9;
+        }
+
+        /* API比喻图示 */
+        .api-analogy {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 28px 0;
+            text-align: center;
+        }
+
+        .analogy-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analogy-scene {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .analogy-role {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .role-box {
+            width: 120px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+        }
+
+        .role-box .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .role-box .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .role-box .sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .analogy-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analogy-arrow .arrow-line {
+            font-size: 28px;
+            color: var(--accent);
+        }
+
+        .analogy-arrow .arrow-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 4px 10px;
+            border-radius: 10px;
+        }
+
+        /* API流程图 */
+        .api-flow {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 28px 0;
+        }
+
+        .flow-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flow-steps-horizontal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .flow-step-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-circle {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .step-circle.active {
+            border-color: var(--accent);
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 100px;
+        }
+
+        .flow-connector {
+            font-size: 20px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* 代码示例 */
+        .code-example {
+            background: var(--bg-code);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border-left: 4px solid var(--accent);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .code-method {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .code-method.get {
+            background: var(--info);
+            color: white;
+        }
+
+        .code-method.post {
+            background: var(--success);
+            color: white;
+        }
+
+        .code-path {
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .code-example pre {
+            margin: 0;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .code-caption {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        /* HTTP方法卡片 */
+        .http-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 28px 0;
+        }
+
+        .method-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .method-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .method-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .method-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .method-badge.get { background: var(--info); }
+        .method-badge.post { background: var(--success); }
+        .method-badge.put { background: var(--warning); }
+        .method-badge.delete { background: #FF4D4F; }
+
+        .method-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .method-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 重点框 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box p, .highlight-box li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .highlight-box li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* 实战场景 */
+        .scenario-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .scenario-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .scenario-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .scenario-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .scenario-apis {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .api-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .api-method-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .api-path-text {
+            color: var(--text-primary);
+            font-family: 'SF Mono', monospace;
+        }
+
+        .api-desc-text {
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* 交互练习 */
+        .practice-box {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 28px 0;
+        }
+
+        .practice-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .practice-header h4 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .practice-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .practice-question {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .question-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent);
+        }
+
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover .option-radio {
+            border-color: var(--accent);
+        }
+
+        .option-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .option-item.selected {
+            border-color: var(--accent);
+            background: rgba(232, 111, 81, 0.05);
+        }
+
+        .option-item.selected .option-radio {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .answer-reveal {
+            background: rgba(82, 196, 26, 0.1);
+            border-left: 4px solid var(--success);
+            border-radius: 0 10px 10px 0;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .answer-reveal.show {
+            display: block;
+        }
+
+        .answer-reveal h5 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+
+        .answer-reveal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* 底部操作栏 */
+        .lesson-footer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        .footer-bar-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-complete {
+            padding: 12px 32px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-complete:hover {
+            background: #389E0D;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+        }
+
+        /* 页面底部留白 */
+        .page-end-spacer {
+            height: 100px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 90px 16px 100px;
+            }
+
+            .lesson-header h1 {
+                font-size: 26px;
+            }
+
+            .content-section {
+                padding: 24px;
+            }
+
+            .analogy-scene {
+                flex-direction: column;
+            }
+
+            .analogy-arrow {
+                transform: rotate(90deg);
+            }
+
+            .flow-steps-horizontal {
+                flex-direction: column;
+            }
+
+            .flow-connector {
+                transform: rotate(90deg);
+            }
+
+            .http-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bar-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-complete {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-section {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .content-section:nth-child(1) { animation-delay: 0.1s; }
+        .content-section:nth-child(2) { animation-delay: 0.2s; }
+        .content-section:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="pm-tech-learning.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <div class="nav-actions">
+                <div class="progress-mini">
+                    <span>课程进度</span>
+                    <div class="progress-mini-bar">
+                        <div class="progress-mini-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 面包屑 -->
+        <nav class="breadcrumb">
+            <a href="pm-tech-learning.html">学习路径</a>
+            <span>›</span>
+            <a href="phase1-detail.html">阶段一</a>
+            <span>›</span>
+            <span class="current">1.3 API：数据的搬运工</span>
+        </nav>
+
+        <!-- 课程头部 -->
+        <header class="lesson-header">
+            <div class="lesson-meta-bar">
+                <span class="lesson-number-badge">1.3</span>
+                <span class="lesson-type">⏱ 25分钟 · 📝 实战演练</span>
+            </div>
+            <h1>API：数据的搬运工</h1>
+            <p class="lesson-intro">
+                API就像餐厅的服务员，负责在客户端（顾客）和服务端（厨房）之间传递信息。理解API的工作原理，是产品经理与开发团队沟通的核心技能。
+            </p>
+        </header>
+
+        <!-- 第一节：API比喻 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🚚</span>
+                API是什么？一个生活中的比喻
+            </h2>
+            
+            <p>
+                想象你走进一家餐厅点餐。你不会直接冲进厨房告诉厨师你想吃什么，而是通过服务员来传递你的需求。服务员接收你的订单（请求），送到厨房（服务端），然后把做好的菜（响应）端给你。
+            </p>
+
+            <div class="api-analogy">
+                <div class="analogy-title">餐厅点餐 = API数据交互</div>
+                <div class="analogy-scene">
+                    <div class="analogy-role">
+                        <div class="role-box">
+                            <div class="icon">👤</div>
+                            <div class="label">顾客</div>
+                            <div class="sub">客户端/App</div>
+                        </div>
+                    </div>
+                    
+                    <div class="analogy-arrow">
+                        <span class="arrow-line">→</span>
+                        <span class="arrow-label">点菜</span>
+                    </div>
+                    
+                    <div class="analogy-role">
+                        <div class="role-box" style="border: 3px solid var(--accent);">
+                            <div class="icon">🤵</div>
+                            <div class="label">服务员</div>
+                            <div class="sub" style="color: var(--accent); font-weight: 600;">API</div>
+                        </div>
+                    </div>
+                    
+                    <div class="analogy-arrow">
+                        <span class="arrow-line">→</span>
+                        <span class="arrow-label">传单</span>
+                    </div>
+                    
+                    <div class="analogy-role">
+                        <div class="role-box">
+                            <div class="icon">👨‍🍳</div>
+                            <div class="label">厨师</div>
+                            <div class="sub">服务端/服务器</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>💡 关键点</h4>
+                <ul>
+                    <li><strong>API是桥梁</strong>：连接客户端和服务端的"中间人"</li>
+                    <li><strong>标准化沟通</strong>：API定义了请求的格式和响应的数据结构</li>
+                    <li><strong>双向传递</strong>：既可以"点菜"（请求数据），也可以"买单"（提交数据）</li>
+                    <li><strong>隐藏细节</strong>：顾客不需要知道厨房怎么做菜，只需要知道怎么点菜</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第二节：API工作流程 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🔄</span>
+                API的完整工作流程
+            </h2>
+
+            <p>
+                一个API调用通常包含四个步骤：构建请求、发送请求、处理请求、返回响应。让我们以"查询商品详情"为例，看看这个过程是如何进行的。
+            </p>
+
+            <div class="api-flow">
+                <div class="flow-title">API 调用四部曲</div>
+                <div class="flow-steps-horizontal">
+                    <div class="flow-step-box">
+                        <div class="step-circle">📦</div>
+                        <div class="step-label">构建请求</div>
+                        <div class="step-desc">确定接口地址、请求方法、参数</div>
+                    </div>
+                    <span class="flow-connector">→</span>
+                    <div class="flow-step-box">
+                        <div class="step-circle">📡</div>
+                        <div class="step-label">发送请求</div>
+                        <div class="step-desc">通过网络将请求发送到服务器</div>
+                    </div>
+                    <span class="flow-connector">→</span>
+                    <div class="flow-step-box">
+                        <div class="step-circle">⚙️</div>
+                        <div class="step-label">处理请求</div>
+                        <div class="step-desc">服务端执行业务逻辑、查询数据库</div>
+                    </div>
+                    <span class="flow-connector">→</span>
+                    <div class="flow-step-box">
+                        <div class="step-circle active">📋</div>
+                        <div class="step-label">返回响应</div>
+                        <div class="step-desc">将处理结果返回给客户端</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>一个真实的API调用示例</h3>
+            <p>假设用户打开了商品详情页，App需要获取商品信息：</p>
+
+            <div class="code-example">
+                <div class="code-header">
+                    <span class="code-method get">GET</span>
+                    <span class="code-path">https://api.shop.com/v1/products/12345</span>
+                </div>
+                <pre>// 第一步：构建请求
+接口地址：/v1/products/12345
+请求方法：GET（获取数据）
+请求参数：productId=12345（商品ID）</pre>
+            </div>
+
+            <div class="code-example">
+                <div class="code-header">
+                    <span style="font-size: 13px; color: var(--success); font-weight: 600;">✓ 200 OK</span>
+                </div>
+                <pre>// 第四步：返回响应
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "productId": "12345",
+    "name": "无线蓝牙耳机",
+    "price": 299.00,
+    "stock": 156,
+    "description": "降噪技术，续航24小时",
+    "images": [
+      "https://cdn.shop.com/img1.jpg",
+      "https://cdn.shop.com/img2.jpg"
+    ]
+  }
+}</pre>
+            </div>
+        </section>
+
+        <!-- 第三节：HTTP方法 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🛠️</span>
+                RESTful API：四种基本操作
+            </h2>
+
+            <p>
+                RESTful API是最常用的API设计规范，它使用HTTP协议定义了四种对资源的操作方式：增删改查。这就像对数据库里的数据进行操作一样。
+            </p>
+
+            <div class="http-methods">
+                <div class="method-card">
+                    <div class="method-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="method-name">获取资源</span>
+                    </div>
+                    <p class="method-desc">从服务器获取数据，不会修改服务器上的任何内容。就像查菜单、看订单状态。</p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="method-name">创建资源</span>
+                    </div>
+                    <p class="method-desc">向服务器提交数据，创建新资源。就像下单、提交表单、发表评论。</p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-header">
+                        <span class="method-badge put">PUT</span>
+                        <span class="method-name">更新资源</span>
+                    </div>
+                    <p class="method-desc">修改服务器上已有的资源。就像修改订单地址、更新个人信息。</p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-header">
+                        <span class="method-badge delete">DELETE</span>
+                        <span class="method-name">删除资源</span>
+                    </div>
+                    <p class="method-desc">删除服务器上的资源。就像取消订单、删除购物车商品。</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>💡 产品经理必知的URL设计规范</h4>
+                <ul>
+                    <li><strong>资源名用复数</strong>：/users 而不是 /user</li>
+                    <li><strong>全部小写</strong>：/products 而不是 /Products</li>
+                    <li><strong>用斜杠表示层级</strong>：/users/123/orders 表示用户123的订单</li>
+                    <li><strong>不用动词</strong>：用 GET /users 而不是 /getUsers</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第四节：实战场景 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">💼</span>
+                实战场景：常见业务API设计
+            </h2>
+
+            <p>
+                让我们看看真实产品中的API是如何设计的。理解这些，你就能更好地阅读接口文档，也能在需求评审时提出更专业的建议。
+            </p>
+
+            <div class="scenario-card">
+                <div class="scenario-header">
+                    <div class="scenario-icon">🛒</div>
+                    <div class="scenario-title">电商购物车场景</div>
+                </div>
+                <p class="scenario-desc">用户浏览商品、加入购物车、结算下单的完整流程涉及的API：</p>
+                <div class="scenario-apis">
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--info);">GET</span>
+                        <span class="api-path-text">/products/{id}</span>
+                        <span class="api-desc-text">获取商品详情</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--success);">POST</span>
+                        <span class="api-path-text">/cart/items</span>
+                        <span class="api-desc-text">添加商品到购物车</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--info);">GET</span>
+                        <span class="api-path-text">/cart</span>
+                        <span class="api-desc-text">获取购物车列表</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--warning);">PUT</span>
+                        <span class="api-path-text">/cart/items/{id}</span>
+                        <span class="api-desc-text">修改商品数量</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: #FF4D4F;">DELETE</span>
+                        <span class="api-path-text">/cart/items/{id}</span>
+                        <span class="api-desc-text">删除购物车商品</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--success);">POST</span>
+                        <span class="api-path-text">/orders</span>
+                        <span class="api-desc-text">创建订单</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-header">
+                    <div class="scenario-icon">👤</div>
+                    <div class="scenario-title">用户中心场景</div>
+                </div>
+                <p class="scenario-desc">用户注册、登录、管理个人信息的API设计：</p>
+                <div class="scenario-apis">
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--success);">POST</span>
+                        <span class="api-path-text">/auth/register</span>
+                        <span class="api-desc-text">用户注册</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--success);">POST</span>
+                        <span class="api-path-text">/auth/login</span>
+                        <span class="api-desc-text">用户登录</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--info);">GET</span>
+                        <span class="api-path-text">/users/me</span>
+                        <span class="api-desc-text">获取当前用户信息</span>
+                    </div>
+                    <div class="api-line">
+                        <span class="api-method-tag" style="background: var(--warning);">PUT</span>
+                        <span class="api-path-text">/users/me</span>
+                        <span class="api-desc-text">更新用户信息</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>⚠️ 产品经理关注点</h4>
+                <ul>
+                    <li><strong>接口粒度</strong>：是一个功能一个接口，还是多个功能合并？影响前后端工作量</li>
+                    <li><strong>数据字段</strong>：接口返回哪些字段？哪些必填？需要PM在PRD中明确</li>
+                    <li><strong>错误处理</strong>：网络失败、服务器错误时，前端如何提示用户？</li>
+                    <li><strong>性能考虑</strong>：列表接口是否分页？一次返回多少条数据？</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第五节：交互练习 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">✏️</span>
+                实战练习：设计API接口
+            </h2>
+
+            <div class="practice-box">
+                <div class="practice-header">
+                    <span style="font-size: 22px;">🎯</span>
+                    <h4>练习：为"文章点赞"功能设计API</h4>
+                </div>
+                <p class="practice-desc">
+                    假设你正在设计一个博客App，需要实现文章点赞功能。用户点击点赞按钮，文章的点赞数+1，再次点击取消点赞。请思考需要哪些API接口？
+                </p>
+
+                <div class="practice-question">
+                    <div class="question-text">以下哪个API设计最合理？</div>
+                    <div class="options-list">
+                        <div class="option-item" onclick="selectOption(this, false)">
+                            <div class="option-radio"></div>
+                            <div class="option-text">
+                                <strong>A.</strong> 只需要一个 GET /articles/{id}/like 接口，每次调用点赞数+1
+                            </div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this, true)">
+                            <div class="option-radio"></div>
+                            <div class="option-text">
+                                <strong>B.</strong> POST /articles/{id}/like 点赞，DELETE /articles/{id}/like 取消点赞
+                            </div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this, false)">
+                            <div class="option-radio"></div>
+                            <div class="option-text">
+                                <strong>C.</strong> 只需要一个 POST /like 接口，通过参数控制是点赞还是取消
+                            </div>
+                        </div>
+                        <div class="option-item" onclick="selectOption(this, false)">
+                            <div class="option-radio"></div>
+                            <div class="option-text">
+                                <strong>D.</strong> 用 PUT /articles/{id} 更新整个文章数据，包含点赞状态
+                            </div>
+                        </div>
+                    </div>
+                    <div class="answer-reveal" id="answerReveal">
+                        <h5>✓ 正确答案是 B</h5>
+                        <p>
+                            点赞和取消点赞是两个独立的操作，分别对应创建（POST）和删除（DELETE）行为，符合RESTful设计原则。A选项无法实现取消点赞；C选项虽然可行，但不够清晰；D选项会导致每次点赞都要传输整篇文章数据，效率低下。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>📝 拓展思考</h4>
+                <p>除了点赞接口，实际场景中还需要考虑：</p>
+                <ul>
+                    <li>如何判断用户是否已经点赞过？（需要在获取文章详情时返回 likeStatus 字段）</li>
+                    <li>点赞是否需要登录？（需要身份认证 Token）</li>
+                    <li>能否重复点赞？（后端需要做幂等性处理）</li>
+                    <li>点赞后如何实时更新点赞数？（需要考虑乐观更新或WebSocket推送）</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 交互式学习组件：API方法匹配游戏 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎮</span>
+                互动游戏：API方法匹配挑战
+            </h2>
+            
+            <p>
+                拖拽正确的 HTTP 方法到对应的场景卡片上，测试你对 RESTful API 的理解程度。完成所有匹配后查看你的得分！
+            </p>
+            
+            <div style="background: var(--bg-primary); border-radius: 16px; padding: 28px; margin-top: 24px;">
+                <!-- 游戏状态栏 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <span style="font-size: 14px; color: var(--text-secondary);">进度：</span>
+                        <div style="display: flex; gap: 8px;">
+                            <div class="progress-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--border-light);"></div>
+                            <div class="progress-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--border-light);"></div>
+                            <div class="progress-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--border-light);"></div>
+                            <div class="progress-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--border-light);"></div>
+                        </div>
+                    </div>
+                    <div id="gameScore" style="font-size: 18px; font-weight: 700; color: var(--accent);">得分：0/4</div>
+                </div>
+                
+                <!-- 可拖拽的方法卡片 -->
+                <div style="margin-bottom: 24px;">
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; text-align: center;">👇 拖拽下方方法到对应场景</div>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <div class="method-drag" draggable="true" data-method="GET" style="padding: 12px 24px; background: var(--info); color: white; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: grab; transition: all 0.3s; user-select: none;">
+                            GET
+                        </div>
+                        <div class="method-drag" draggable="true" data-method="POST" style="padding: 12px 24px; background: var(--success); color: white; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: grab; transition: all 0.3s; user-select: none;">
+                            POST
+                        </div>
+                        <div class="method-drag" draggable="true" data-method="PUT" style="padding: 12px 24px; background: var(--warning); color: white; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: grab; transition: all 0.3s; user-select: none;">
+                            PUT
+                        </div>
+                        <div class="method-drag" draggable="true" data-method="DELETE" style="padding: 12px 24px; background: #FF4D4F; color: white; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: grab; transition: all 0.3s; user-select: none;">
+                            DELETE
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 场景卡片 -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                    <!-- 场景1 -->
+                    <div class="scenario-drop" data-answer="GET" data-scenario="1" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 2px dashed var(--border-light); min-height: 140px; transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🔍</span>
+                            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">查看商品详情</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6;">用户点击商品卡片，需要获取商品的详细信息，包括名称、价格、库存等。</p>
+                        <div class="drop-zone" style="padding: 12px; background: var(--bg-primary); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 13px; min-height: 44px; display: flex; align-items: center; justify-content: center;">
+                            拖拽方法到此处
+                        </div>
+                    </div>
+                    
+                    <!-- 场景2 -->
+                    <div class="scenario-drop" data-answer="POST" data-scenario="2" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 2px dashed var(--border-light); min-height: 140px; transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">📝</span>
+                            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">提交新评论</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6;">用户填写评论内容后提交，需要创建一条新的评论记录。</p>
+                        <div class="drop-zone" style="padding: 12px; background: var(--bg-primary); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 13px; min-height: 44px; display: flex; align-items: center; justify-content: center;">
+                            拖拽方法到此处
+                        </div>
+                    </div>
+                    
+                    <!-- 场景3 -->
+                    <div class="scenario-drop" data-answer="PUT" data-scenario="3" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 2px dashed var(--border-light); min-height: 140px; transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">✏️</span>
+                            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">修改收货地址</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6;">用户编辑已保存的收货地址，更新联系人、电话、详细地址信息。</p>
+                        <div class="drop-zone" style="padding: 12px; background: var(--bg-primary); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 13px; min-height: 44px; display: flex; align-items: center; justify-content: center;">
+                            拖拽方法到此处
+                        </div>
+                    </div>
+                    
+                    <!-- 场景4 -->
+                    <div class="scenario-drop" data-answer="DELETE" data-scenario="4" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; border: 2px dashed var(--border-light); min-height: 140px; transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🗑️</span>
+                            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">删除购物车商品</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6;">用户点击删除按钮，从购物车中移除某件商品。</p>
+                        <div class="drop-zone" style="padding: 12px; background: var(--bg-primary); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 13px; min-height: 44px; display: flex; align-items: center; justify-content: center;">
+                            拖拽方法到此处
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 结果反馈区域 -->
+                <div id="gameResult" style="margin-top: 24px; padding: 20px; border-radius: 12px; display: none; text-align: center;">
+                </div>
+                
+                <!-- 重置按钮 -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="resetApiGame()" style="padding: 10px 24px; background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-light); border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+                        🔄 重新开始
+                    </button>
+                </div>
+            </div>
+            
+            <div class="highlight-box" style="margin-top: 24px;">
+                <h4>💡 RESTful API 设计原则</h4>
+                <ul>
+                    <li><strong>GET</strong> - 获取资源，幂等操作，不改变服务器状态</li>
+                    <li><strong>POST</strong> - 创建新资源，非幂等，每次调用可能产生不同结果</li>
+                    <li><strong>PUT</strong> - 更新资源，幂等操作，整体替换</li>
+                    <li><strong>DELETE</strong> - 删除资源，幂等操作</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 底部留白 -->
+        <div class="page-end-spacer"></div>
+    </main>
+
+    <!-- 底部操作栏 -->
+    <div class="lesson-footer-bar">
+        <div class="footer-bar-content">
+            <div class="footer-nav">
+                <a href="lesson-1-2-detail.html" class="btn-nav">← 上一课</a>
+                <a href="phase1-detail.html" class="btn-nav">课程列表</a>
+            </div>
+            <button class="btn-complete" onclick="markComplete()">
+                <span>✓</span>
+                <span>标记为已完成</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 进度追踪
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = Math.round((scrollTop / docHeight) * 100);
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+        
+        // 选项选择
+        function selectOption(element, isCorrect) {
+            // 移除其他选中状态
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 添加选中状态
+            element.classList.add('selected');
+            
+            // 显示答案
+            const answerReveal = document.getElementById('answerReveal');
+            answerReveal.classList.add('show');
+            answerReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // 标记完成
+        function markComplete() {
+            const btn = document.querySelector('.btn-complete');
+            btn.innerHTML = '<span>✓</span><span>已完成</span>';
+            btn.style.background = '#389E0D';
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+            
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = '100%';
+            
+            setTimeout(() => {
+                alert('恭喜完成本课程！🎉');
+            }, 300);
+        }
+        
+        // 初始化
+        updateProgress();
+        
+        // ========== API方法匹配游戏 ==========
+        let matchedCount = 0;
+        const totalScenarios = 4;
+        const methodStyles = {
+            'GET': { bg: 'var(--info)', text: 'GET' },
+            'POST': { bg: 'var(--success)', text: 'POST' },
+            'PUT': { bg: 'var(--warning)', text: 'PUT' },
+            'DELETE': { bg: '#FF4D4F', text: 'DELETE' }
+        };
+        
+        // 拖拽事件
+        document.querySelectorAll('.method-drag').forEach(draggable => {
+            draggable.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('method', draggable.dataset.method);
+                draggable.style.opacity = '0.5';
+            });
+            
+            draggable.addEventListener('dragend', (e) => {
+                draggable.style.opacity = '1';
+            });
+        });
+        
+        // 放置区域事件
+        document.querySelectorAll('.scenario-drop').forEach(dropZone => {
+            const zone = dropZone.querySelector('.drop-zone');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--accent)';
+                dropZone.style.background = 'rgba(232, 111, 81, 0.05)';
+            });
+            
+            dropZone.addEventListener('dragleave', (e) => {
+                dropZone.style.borderColor = 'var(--border-light)';
+                dropZone.style.background = 'var(--bg-secondary)';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--border-light)';
+                dropZone.style.background = 'var(--bg-secondary)';
+                
+                const method = e.dataTransfer.getData('method');
+                const answer = dropZone.dataset.answer;
+                const scenarioIndex = parseInt(dropZone.dataset.scenario) - 1;
+                
+                if (dropZone.classList.contains('completed')) return;
+                
+                // 显示放置的方法
+                zone.innerHTML = `<span style="padding: 8px 20px; background: ${methodStyles[method].bg}; color: white; border-radius: 6px; font-weight: 700;">${method}</span>`;
+                
+                // 检查答案
+                if (method === answer) {
+                    dropZone.classList.add('completed');
+                    dropZone.style.borderColor = 'var(--success)';
+                    zone.innerHTML += '<span style="margin-left: 8px; color: var(--success); font-size: 16px;">✓</span>';
+                    
+                    // 更新进度
+                    matchedCount++;
+                    updateProgressDots();
+                    updateScore();
+                    
+                    // 检查是否完成
+                    if (matchedCount === totalScenarios) {
+                        showGameResult();
+                    }
+                } else {
+                    // 错误反馈
+                    dropZone.style.borderColor = '#FF4D4F';
+                    zone.innerHTML += '<span style="margin-left: 8px; color: #FF4D4F; font-size: 14px;">✗ 再想想</span>';
+                    
+                    // 2秒后重置
+                    setTimeout(() => {
+                        dropZone.style.borderColor = 'var(--border-light)';
+                        zone.innerHTML = '拖拽方法到此处';
+                    }, 1500);
+                }
+            });
+        });
+        
+        function updateProgressDots() {
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, index) => {
+                if (index < matchedCount) {
+                    dot.style.background = 'var(--success)';
+                }
+            });
+        }
+        
+        function updateScore() {
+            document.getElementById('gameScore').textContent = `得分：${matchedCount}/${totalScenarios}`;
+        }
+        
+        function showGameResult() {
+            const resultDiv = document.getElementById('gameResult');
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = 'linear-gradient(135deg, rgba(82, 196, 26, 0.1) 0%, rgba(56, 158, 13, 0.1) 100%)';
+            resultDiv.style.border = '2px solid var(--success)';
+            resultDiv.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--success); margin-bottom: 8px;">恭喜你！全部正确！</div>
+                <div style="font-size: 14px; color: var(--text-secondary);">你已经掌握了 RESTful API 方法的基本使用场景</div>
+            `;
+        }
+        
+        function resetApiGame() {
+            matchedCount = 0;
+            
+            // 重置进度点
+            document.querySelectorAll('.progress-dot').forEach(dot => {
+                dot.style.background = 'var(--border-light)';
+            });
+            
+            // 重置分数
+            updateScore();
+            
+            // 重置场景卡片
+            document.querySelectorAll('.scenario-drop').forEach(drop => {
+                drop.classList.remove('completed');
+                drop.style.borderColor = 'var(--border-light)';
+                drop.querySelector('.drop-zone').innerHTML = '拖拽方法到此处';
+            });
+            
+            // 隐藏结果
+            document.getElementById('gameResult').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

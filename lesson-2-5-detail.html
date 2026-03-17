@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.5 数据字典与字段设计 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --error: #FF4D4F;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .progress-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 4px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-mini-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--info) 0%, var(--success) 100%);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* 主内容 */
+        .main-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 24px 120px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        /* 课程头部 */
+        .lesson-header {
+            margin-bottom: 48px;
+        }
+
+        .lesson-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .lesson-number-badge {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .lesson-type {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .lesson-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .lesson-intro {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* 内容区块 */
+        .content-section {
+            margin-bottom: 48px;
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .content-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        /* 卡片网格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* 高亮框 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .highlight-box li {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-code);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            border-left: 4px solid var(--accent);
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            margin: 20px 0;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .keyword {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .code-block .string {
+            color: var(--success);
+        }
+
+        /* 数据字典表格 */
+        .dict-table-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            margin: 24px 0;
+        }
+
+        .dict-table-header {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dict-table-header h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .dict-table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-small:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .dict-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dict-table th,
+        .dict-table td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .dict-table th {
+            background: var(--bg-primary);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .dict-table td {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .dict-table tr:hover {
+            background: var(--bg-primary);
+        }
+
+        .dict-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 字段标签 */
+        .field-type {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(24, 144, 255, 0.1);
+            color: var(--info);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .field-type.string { background: rgba(82, 196, 26, 0.1); color: var(--success); }
+        .field-type.number { background: rgba(24, 144, 255, 0.1); color: var(--info); }
+        .field-type.date { background: rgba(250, 173, 20, 0.1); color: var(--warning); }
+        .field-type.boolean { background: rgba(232, 111, 81, 0.1); color: var(--accent); }
+
+        .field-constraint {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .constraint-pk { color: var(--accent); font-weight: 600; }
+        .constraint-fk { color: var(--info); }
+        .constraint-required { color: var(--error); }
+        .constraint-idx { color: var(--success); }
+
+        /* 字段类型卡片 */
+        .type-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .type-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .type-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .type-card .type-name {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .type-card .type-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .type-card .type-example {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'SF Mono', Monaco, monospace;
+            background: var(--bg-code);
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        /* 字段详情面板 */
+        .field-detail-panel {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .field-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .field-detail-header h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .field-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .field-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-detail-item .label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-detail-item .value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* 列表样式 */
+        .content-list {
+            margin: 20px 0;
+            padding-left: 24px;
+        }
+
+        .content-list li {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        .content-list li strong {
+            color: var(--text-primary);
+        }
+
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-accent {
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+        }
+
+        /* 底部操作栏 */
+        .footer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .footer-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            padding: 12px 28px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-primary {
+            padding: 12px 32px;
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(232, 111, 81, 0.3);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 90px 16px 140px;
+            }
+
+            .lesson-header h1 {
+                font-size: 28px;
+            }
+
+            .content-section h2 {
+                font-size: 22px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bar {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-nav {
+                width: 100%;
+            }
+
+            .footer-nav .btn-secondary,
+            .footer-nav .btn-primary {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .dict-table th,
+            .dict-table td {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .dict-table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+        }
+
+        /* 提示框 */
+        .tip-box {
+            background: rgba(24, 144, 255, 0.08);
+            border-left: 4px solid var(--info);
+            border-radius: 0 12px 12px 0;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .tip-box-title {
+            font-weight: 600;
+            color: var(--info);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-box p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <div class="nav-actions">
+                <div class="progress-mini">
+                    <span>学习进度</span>
+                    <div class="progress-mini-bar">
+                        <div class="progress-mini-fill" style="width: 0%;" id="progressBar"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="index.html">首页</a>
+            <span>/</span>
+            <a href="phase2-detail.html">第二阶段</a>
+            <span>/</span>
+            <span>2.5 数据字典与字段设计</span>
+        </div>
+
+        <!-- 课程头部 -->
+        <header class="lesson-header">
+            <div class="lesson-meta-bar">
+                <span class="lesson-number-badge">2.5</span>
+                <span class="lesson-type">⏱ 25分钟 · 📄 图文课程</span>
+            </div>
+            <h1>数据字典与字段设计</h1>
+            <p class="lesson-intro">
+                数据字典是产品经理与开发沟通的重要工具。掌握字段类型、约束规则、命名规范，能够让你更准确地描述业务需求，减少开发返工。
+            </p>
+        </header>
+
+        <!-- 什么是数据字典 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📚</span>
+                什么是数据字典
+            </h2>
+            <p>数据字典（Data Dictionary）是对数据库中所有数据元素的定义和描述的集合。对于产品经理来说，它是与开发团队沟通业务规则的「翻译手册」。</p>
+            
+            <div class="highlight-box">
+                <h4>💡 为什么产品经理需要掌握数据字典</h4>
+                <ul>
+                    <li><strong>精准沟通：</strong>用开发听得懂的语言描述需求</li>
+                    <li><strong>避免歧义：</strong>字段定义清晰，减少开发返工</li>
+                    <li><strong>验收依据：</strong>作为功能验收的参考标准</li>
+                    <li><strong>文档沉淀：</strong>便于后期维护和交接</li>
+                </ul>
+            </div>
+
+            <p>一份完整的数据字典通常包含以下内容：</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🏷️</div>
+                        <h4>字段名称</h4>
+                    </div>
+                    <p>英文字段名（如 user_id）和中文业务名称（用户ID）</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔤</div>
+                        <h4>数据类型</h4>
+                    </div>
+                    <p>VARCHAR、INT、DATETIME 等字段类型定义</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📏</div>
+                        <h4>长度/精度</h4>
+                    </div>
+                    <p>字符串长度、数字精度、小数位等限制</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">⭐</div>
+                        <h4>约束规则</h4>
+                    </div>
+                    <p>主键、外键、必填、唯一性等约束</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📝</div>
+                        <h4>业务说明</h4>
+                    </div>
+                    <p>字段的业务含义、取值范围、使用场景</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📎</div>
+                        <h4>示例值</h4>
+                    </div>
+                    <p>典型取值示例，便于理解字段用途</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 常用字段类型 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🔤</span>
+                常用字段类型速查
+            </h2>
+            <p>以下是产品经理需要了解的常见数据库字段类型，帮助你在需求文档中更准确地描述字段要求：</p>
+
+            <h3>字符串类型</h3>
+            <div class="type-card-grid">
+                <div class="type-card">
+                    <div class="type-name">VARCHAR(n)</div>
+                    <div class="type-desc">变长字符串，适合用户名、标题等长度不定的文本</div>
+                    <div class="type-example">VARCHAR(50)</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">CHAR(n)</div>
+                    <div class="type-desc">定长字符串，适合手机号、身份证号等固定长度</div>
+                    <div class="type-example">CHAR(11)</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">TEXT</div>
+                    <div class="type-desc">长文本，适合文章内容、备注等大量文字</div>
+                    <div class="type-example">TEXT</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">JSON</div>
+                    <div class="type-desc">JSON 格式数据，适合配置、扩展属性等</div>
+                    <div class="type-example">JSON</div>
+                </div>
+            </div>
+
+            <h3>数值类型</h3>
+            <div class="type-card-grid">
+                <div class="type-card">
+                    <div class="type-name">INT</div>
+                    <div class="type-desc">整数，适合年龄、数量、状态码等</div>
+                    <div class="type-example">INT</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">BIGINT</div>
+                    <div class="type-desc">大整数，适合主键ID、大数值统计</div>
+                    <div class="type-example">BIGINT</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">DECIMAL</div>
+                    <div class="type-desc">精确小数，适合金额、汇率等精度要求高的场景</div>
+                    <div class="type-example">DECIMAL(10,2)</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">FLOAT</div>
+                    <div class="type-desc">浮点数，适合科学计算、坐标等</div>
+                    <div class="type-example">FLOAT</div>
+                </div>
+            </div>
+
+            <h3>日期时间类型</h3>
+            <div class="type-card-grid">
+                <div class="type-card">
+                    <div class="type-name">DATE</div>
+                    <div class="type-desc">日期，格式：YYYY-MM-DD</div>
+                    <div class="type-example">2024-01-15</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">DATETIME</div>
+                    <div class="type-desc">日期时间，格式：YYYY-MM-DD HH:MM:SS</div>
+                    <div class="type-example">2024-01-15 14:30:00</div>
+                </div>
+                <div class="type-card">
+                    <div class="type-name">TIMESTAMP</div>
+                    <div class="type-desc">时间戳，自动记录创建/更新时间</div>
+                    <div class="type-example">1705315800</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 字段约束规则 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">⭐</span>
+                字段约束规则详解
+            </h2>
+            <p>约束规则决定了字段的取值范围和业务规则，是数据质量的重要保障。</p>
+
+            <div class="dict-table-container">
+                <div class="dict-table-header">
+                    <h4>📋 约束类型说明</h4>
+                </div>
+                <table class="dict-table">
+                    <thead>
+                        <tr>
+                            <th>约束标识</th>
+                            <th>约束名称</th>
+                            <th>说明</th>
+                            <th>示例场景</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="field-constraint constraint-pk">🔑 PK</span></td>
+                            <td>主键 (Primary Key)</td>
+                            <td>唯一标识每条记录，不能为空</td>
+                            <td>user_id、order_id</td>
+                        </tr>
+                        <tr>
+                            <td><span class="field-constraint constraint-fk">🔗 FK</span></td>
+                            <td>外键 (Foreign Key)</td>
+                            <td>关联其他表的主键</td>
+                            <td>订单表关联用户表</td>
+                        </tr>
+                        <tr>
+                            <td><span class="field-constraint constraint-required">❗ NOT NULL</span></td>
+                            <td>非空约束</td>
+                            <td>字段必须有值</td>
+                            <td>手机号、邮箱</td>
+                        </tr>
+                        <tr>
+                            <td><span class="field-constraint">🔷 UNIQUE</span></td>
+                            <td>唯一约束</td>
+                            <td>字段值不能重复</td>
+                            <td>用户名、订单号</td>
+                        </tr>
+                        <tr>
+                            <td><span class="field-constraint constraint-idx">📇 IDX</span></td>
+                            <td>索引</td>
+                            <td>加速查询，可重复</td>
+                            <td>手机号查询、时间范围</td>
+                        </tr>
+                        <tr>
+                            <td><span class="field-constraint">📋 DEFAULT</span></td>
+                            <td>默认值</td>
+                            <td>未指定时的默认值</td>
+                            <td>status = 0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-box-title">💡 产品经理提示</div>
+                <p>在需求文档中标注关键约束，特别是<strong>必填字段</strong>和<strong>唯一性要求</strong>，这些是开发最容易遗漏的地方。</p>
+            </div>
+        </section>
+
+        <!-- 实战案例：用户表数据字典 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎯</span>
+                实战案例：用户表数据字典
+            </h2>
+            <p>以下是一份完整的用户表数据字典示例，展示了产品经理应该如何规范地定义字段：</p>
+
+            <div class="dict-table-container">
+                <div class="dict-table-header">
+                    <h4>👤 t_user（用户表）</h4>
+                    <div class="dict-table-actions">
+                        <button class="btn-small">+ 新增字段</button>
+                        <button class="btn-small">导出</button>
+                    </div>
+                </div>
+                <table class="dict-table">
+                    <thead>
+                        <tr>
+                            <th>字段名</th>
+                            <th>中文名</th>
+                            <th>数据类型</th>
+                            <th>约束</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>用户ID</td>
+                            <td><span class="field-type number">BIGINT</span></td>
+                            <td>
+                                <span class="field-constraint constraint-pk">🔑 PK</span>
+                                <span class="field-constraint">AUTO</span>
+                            </td>
+                            <td>自增主键，唯一标识用户</td>
+                        </tr>
+                        <tr>
+                            <td><code>username</code></td>
+                            <td>用户名</td>
+                            <td><span class="field-type string">VARCHAR(32)</span></td>
+                            <td>
+                                <span class="field-constraint">🔷 UNIQUE</span>
+                                <span class="field-constraint constraint-required">❗ NOT NULL</span>
+                            </td>
+                            <td>2-32位字母数字组合</td>
+                        </tr>
+                        <tr>
+                            <td><code>mobile</code></td>
+                            <td>手机号</td>
+                            <td><span class="field-type string">CHAR(11)</span></td>
+                            <td>
+                                <span class="field-constraint">🔷 UNIQUE</span>
+                                <span class="field-constraint constraint-idx">📇 IDX</span>
+                            </td>
+                            <td>11位手机号，登录账号</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>邮箱</td>
+                            <td><span class="field-type string">VARCHAR(64)</span></td>
+                            <td>
+                                <span class="field-constraint">🔷 UNIQUE</span>
+                            </td>
+                            <td>可选，用于找回密码</td>
+                        </tr>
+                        <tr>
+                            <td><code>password</code></td>
+                            <td>密码</td>
+                            <td><span class="field-type string">VARCHAR(128)</span></td>
+                            <td>
+                                <span class="field-constraint constraint-required">❗ NOT NULL</span>
+                            </td>
+                            <td>MD5加密存储</td>
+                        </tr>
+                        <tr>
+                            <td><code>avatar</code></td>
+                            <td>头像URL</td>
+                            <td><span class="field-type string">VARCHAR(256)</span></td>
+                            <td></td>
+                            <td>默认使用系统头像</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>账号状态</td>
+                            <td><span class="field-type number">TINYINT</span></td>
+                            <td>
+                                <span class="field-constraint">📋 DEFAULT 1</span>
+                            </td>
+                            <td>0-禁用 1-正常 2-未激活</td>
+                        </tr>
+                        <tr>
+                            <td><code>created_at</code></td>
+                            <td>创建时间</td>
+                            <td><span class="field-type date">DATETIME</span></td>
+                            <td>
+                                <span class="field-constraint constraint-idx">📇 IDX</span>
+                            </td>
+                            <td>注册时间</td>
+                        </tr>
+                        <tr>
+                            <td><code>updated_at</code></td>
+                            <td>更新时间</td>
+                            <td><span class="field-type date">DATETIME</span></td>
+                            <td></td>
+                            <td>自动更新</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>字段详解：status 状态字段</h3>
+            <div class="field-detail-panel">
+                <div class="field-detail-header">
+                    <span style="font-size: 24px;">📊</span>
+                    <h4>status 字段设计</h4>
+                </div>
+                <div class="field-detail-grid">
+                    <div class="field-detail-item">
+                        <span class="label">字段名</span>
+                        <span class="value">status</span>
+                    </div>
+                    <div class="field-detail-item">
+                        <span class="label">数据类型</span>
+                        <span class="value">TINYINT (1字节整数)</span>
+                    </div>
+                    <div class="field-detail-item">
+                        <span class="label">默认值</span>
+                        <span class="value">1 (正常)</span>
+                    </div>
+                    <div class="field-detail-item">
+                        <span class="label">取值范围</span>
+                        <span class="value">0, 1, 2</span>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-light);">
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+                        <strong>业务含义：</strong><br>
+                        <span class="tag tag-accent">0</span> 禁用 - 用户被封禁，无法登录<br>
+                        <span class="tag tag-accent">1</span> 正常 - 账号可正常使用<br>
+                        <span class="tag tag-accent">2</span> 未激活 - 注册后未验证邮箱/手机
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 字段命名规范 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📝</span>
+                字段命名规范
+            </h2>
+            <p>统一的命名规范能够大幅提升团队协作效率和代码可读性。</p>
+
+            <h3>命名基本原则</h3>
+            <ul class="content-list">
+                <li><strong>小写 + 下划线：</strong>使用 snake_case 格式，如 <code>user_name</code> 而非 <code>userName</code> 或 <code>UserName</code></li>
+                <li><strong>英文为主：</strong>避免拼音，如用 <code>status</code> 而非 <code>zhuangtai</code></li>
+                <li><strong>简洁明了：</strong>命名要有意义，如 <code>mobile</code> 优于 <code>tel</code></li>
+                <li><strong>避免保留字：</strong>不要用 <code>order</code>、<code>key</code> 等数据库保留字</li>
+            </ul>
+
+            <h3>常用命名约定</h3>
+            <div class="dict-table-container">
+                <table class="dict-table">
+                    <thead>
+                        <tr>
+                            <th>场景</th>
+                            <th>推荐命名</th>
+                            <th>不推荐</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>主键ID</td>
+                            <td><code>id</code></td>
+                            <td><code>user_id</code></td>
+                            <td>表内统一用 id</td>
+                        </tr>
+                        <tr>
+                            <td>外键ID</td>
+                            <td><code>user_id</code></td>
+                            <td><code>uid</code> / <code>userId</code></td>
+                            <td>关联表名 + _id</td>
+                        </tr>
+                        <tr>
+                            <td>创建时间</td>
+                            <td><code>created_at</code></td>
+                            <td><code>create_time</code></td>
+                            <td>统一用 _at 后缀</td>
+                        </tr>
+                        <tr>
+                            <td>更新时间</td>
+                            <td><code>updated_at</code></td>
+                            <td><code>update_time</code></td>
+                            <td>统一用 _at 后缀</td>
+                        </tr>
+                        <tr>
+                            <td>是否删除</td>
+                            <td><code>is_deleted</code></td>
+                            <td><code>deleted</code> / <code>del_flag</code></td>
+                            <td>is_ 前缀 + 形容词</td>
+                        </tr>
+                        <tr>
+                            <td>状态字段</td>
+                            <td><code>status</code></td>
+                            <td><code>state</code> / <code>stat</code></td>
+                            <td>统一用 status</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="highlight-box">
+                <h4>✅ 命名检查清单</h4>
+                <ul>
+                    <li>所有字段名是否使用小写和下划线？</li>
+                    <li>时间字段是否统一使用 _at 后缀？</li>
+                    <li>布尔字段是否使用 is_ 前缀？</li>
+                    <li>外键是否使用 表名_id 格式？</li>
+                    <li>是否避免了数据库保留字？</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 产品经理实战 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🚀</span>
+                产品经理实战指南
+            </h2>
+
+            <h3>如何编写数据字典文档</h3>
+            <p>在 PRD 中描述数据需求时，建议按以下结构组织：</p>
+
+            <div class="code-block">
+<span class="comment">-- 示例：订单模块数据字典（PRD 节选）</span>
+
+<span class="keyword">【订单表】t_order</span>
+├─ id: BIGINT PK - 订单ID，全局唯一
+├─ order_no: VARCHAR(32) UK - 订单编号，用户可见（如：202401151430001）
+├─ user_id: BIGINT FK - 买家用户ID，关联 t_user.id
+├─ total_amount: DECIMAL(10,2) - 订单总金额（元）
+├─ status: TINYINT DEFAULT 0 - 订单状态：0待付款 1待发货 2已发货 3已完成 4已取消
+├─ pay_time: DATETIME - 支付时间，支付成功后更新
+├─ created_at: DATETIME - 下单时间
+└─ updated_at: DATETIME - 最后更新时间
+
+<span class="keyword">【订单商品表】t_order_item</span>
+├─ id: BIGINT PK
+├─ order_id: BIGINT FK - 关联订单
+├─ product_id: BIGINT FK - 关联商品
+├─ product_name: VARCHAR(128) - 商品名称（快照，防修改）
+├─ price: DECIMAL(10,2) - 下单时单价
+├─ quantity: INT - 购买数量
+└─ subtotal: DECIMAL(10,2) - 小计金额（price * quantity）
+            </div>
+
+            <h3>与开发沟通的数据字段清单</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">1️⃣</div>
+                        <h4>确定字段类型</h4>
+                    </div>
+                    <p>字符串长度是否足够？数值是否需要小数？时间是否需要时分秒？</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">2️⃣</div>
+                        <h4>明确约束规则</h4>
+                    </div>
+                    <p>哪些字段必填？哪些是唯一的？是否需要索引加速查询？</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">3️⃣</div>
+                        <h4>定义状态值</h4>
+                    </div>
+                    <p>状态字段有哪些取值？每个值的业务含义是什么？</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">4️⃣</div>
+                        <h4>确认默认值</h4>
+                    </div>
+                    <p>新增记录时，各字段的默认值是什么？是否允许为空？</p>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-box-title">🎯 实战技巧</div>
+                <p>在需求评审会上，<strong>提前准备好数据字典草稿</strong>，与开发逐条确认字段定义。这比口头描述更准确，也能让开发感受到你的专业性。</p>
+            </div>
+        </section>
+
+        <!-- 交互式学习：字段类型匹配游戏 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎮</span>
+                互动练习：字段类型匹配
+            </h2>
+            
+            <p>
+                将左侧的业务场景拖拽到右侧对应的字段类型上，测试你对数据类型的理解。全部匹配正确即可通关！
+            </p>
+            
+            <div style="background: var(--bg-primary); border-radius: 16px; padding: 28px; margin-top: 24px;">
+                <!-- 游戏说明 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">🎯 匹配得分：<span id="matchScore">0</span> / 6</div>
+                    <button onclick="resetMatchingGame()" style="padding: 8px 16px; background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-light); border-radius: 16px; font-size: 13px; cursor: pointer;">
+                        🔄 重新开始
+                    </button>
+                </div>
+                
+                <!-- 匹配区域 -->
+                <div style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 20px; align-items: start;">
+                    <!-- 左侧：业务场景卡片 -->
+                    <div id="scenarioList" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- 动态生成 -->
+                    </div>
+                    
+                    <!-- 中间：连接指示 -->
+                    <div style="display: flex; flex-direction: column; justify-content: space-around; height: 100%; padding-top: 8px;">
+                        <div id="line0" style="height: 2px; background: var(--border-light); margin: 16px 0;"></div>
+                        <div id="line1" style="height: 2px; background: var(--border-light); margin: 16px 0;"></div>
+                        <div id="line2" style="height: 2px; background: var(--border-light); margin: 16px 0;"></div>
+                        <div id="line3" style="height: 2px; background: var(--border-light); margin: 16px 0;"></div>
+                        <div id="line4" style="height: 2px; background: var(--border-light); margin: 16px 0;"></div>
+                        <div id="line5" style="height: 2px; background: var(--border-light); margin: 16px 0;"></div>
+                    </div>
+                    
+                    <!-- 右侧：字段类型卡片 -->
+                    <div id="typeList" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 结果反馈 -->
+                <div id="matchFeedback" style="margin-top: 24px; padding: 20px; background: var(--bg-secondary); border-radius: 12px; text-align: center; display: none;">
+                    <div style="font-size: 18px; font-weight: 600; color: var(--success); margin-bottom: 8px;">🎉 恭喜通关！</div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">你已经掌握了常见的字段类型匹配规则</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box" style="margin-top: 24px;">
+                <h4>💡 字段类型选择技巧</h4>
+                <ul style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
+                    <li><strong>VARCHAR</strong>：变长字符串，适合用户名、标题、描述等</li>
+                    <li><strong>INT/BIGINT</strong>：整数，适合数量、状态码、ID等</li>
+                    <li><strong>DECIMAL</strong>：精确小数，适合金额、比例等精度要求高的场景</li>
+                    <li><strong>DATETIME</strong>：日期时间，适合创建时间、更新时间等</li>
+                    <li><strong>TEXT</strong>：长文本，适合文章内容、备注等大量文字</li>
+                    <li><strong>TINYINT</strong>：小整数，适合状态、类型等有限取值</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 章节总结 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎓</span>
+                章节总结
+            </h2>
+            <div class="highlight-box">
+                <h4>📌 核心知识点</h4>
+                <ul>
+                    <li><strong>数据字典</strong>是产品经理与开发沟通的「翻译手册」</li>
+                    <li>常用字段类型：字符串(VARCHAR)、整数(INT/BIGINT)、小数(DECIMAL)、时间(DATETIME)</li>
+                    <li>关键约束：主键(PK)、外键(FK)、非空(NOT NULL)、唯一(UNIQUE)、索引(IDX)</li>
+                    <li>命名规范：小写+下划线、表名前缀、时间用 _at 后缀、布尔用 is_ 前缀</li>
+                    <li>PRD 中应包含核心表的字段定义，便于开发和验收</li>
+                </ul>
+            </div>
+            <p style="margin-top: 24px; text-align: center; color: var(--text-muted);">
+                完成本课程学习，你对数据字典的理解又进了一步！继续加油 🎉
+            </p>
+        </section>
+    </main>
+
+    <!-- 底部操作栏 -->
+    <div class="footer-bar">
+        <div class="footer-info">
+            <span style="color: var(--text-muted); font-size: 14px;">下一节：2.6 接口文档阅读指南</span>
+        </div>
+        <div class="footer-nav">
+            <a href="lesson-2-4-detail.html" class="btn-secondary">← 上一节</a>
+            <button class="btn-primary" onclick="markComplete()">
+                <span>✓</span>
+                <span>标记完成</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 滚动进度追踪
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = Math.min(100, Math.round((scrollTop / docHeight) * 100));
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('load', updateProgress);
+
+        // 标记完成
+        function markComplete() {
+            const btn = document.querySelector('.btn-primary');
+            btn.innerHTML = '<span>✓</span><span>已完成</span>';
+            btn.style.background = 'var(--success)';
+            
+            // 保存到 localStorage
+            const completed = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+            if (!completed.includes('2-5')) {
+                completed.push('2-5');
+                localStorage.setItem('completedLessons', JSON.stringify(completed));
+            }
+            
+            setTimeout(() => {
+                alert('恭喜完成本节课程！');
+            }, 300);
+        }
+
+        // 检查是否已完成
+        window.addEventListener('load', () => {
+            const completed = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+            if (completed.includes('2-5')) {
+                const btn = document.querySelector('.btn-primary');
+                btn.innerHTML = '<span>✓</span><span>已完成</span>';
+                btn.style.background = 'var(--success)';
+            }
+        });
+        
+        // ========== 字段类型匹配游戏 ==========
+        const matchingData = [
+            { scenario: '用户名（2-32字符）', type: 'VARCHAR(32)', color: '#52C41A' },
+            { scenario: '订单总金额', type: 'DECIMAL(10,2)', color: '#E86F51' },
+            { scenario: '商品数量', type: 'INT', color: '#1890FF' },
+            { scenario: '创建时间', type: 'DATETIME', color: '#FAAD14' },
+            { scenario: '商品详情描述', type: 'TEXT', color: '#722ED1' },
+            { scenario: '订单状态（0-4）', type: 'TINYINT', color: '#13C2C2' }
+        ];
+        
+        let matchedCount = 0;
+        let selectedScenario = null;
+        let selectedType = null;
+        let matchedPairs = [];
+        
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function initMatchingGame() {
+            matchedCount = 0;
+            selectedScenario = null;
+            selectedType = null;
+            matchedPairs = [];
+            document.getElementById('matchScore').textContent = '0';
+            document.getElementById('matchFeedback').style.display = 'none';
+            
+            // 重置连接线
+            for (let i = 0; i < 6; i++) {
+                document.getElementById('line' + i).style.background = 'var(--border-light)';
+            }
+            
+            // 生成场景卡片
+            const shuffledScenarios = shuffleArray(matchingData);
+            const scenarioList = document.getElementById('scenarioList');
+            scenarioList.innerHTML = shuffledScenarios.map((item, idx) => `
+                <div class="match-card scenario-card" data-type="${item.type}" data-idx="${idx}" onclick="selectScenario(this)" style="padding: 14px 18px; background: var(--bg-secondary); border: 2px solid var(--border-light); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--text-primary);">
+                    ${item.scenario}
+                </div>
+            `).join('');
+            
+            // 生成类型卡片
+            const shuffledTypes = shuffleArray(matchingData);
+            const typeList = document.getElementById('typeList');
+            typeList.innerHTML = shuffledTypes.map((item, idx) => `
+                <div class="match-card type-card" data-type="${item.type}" data-idx="${idx}" onclick="selectType(this)" style="padding: 14px 18px; background: var(--bg-secondary); border: 2px solid var(--border-light); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 13px; font-family: 'SF Mono', Monaco, monospace; color: ${item.color}; font-weight: 600;">
+                    ${item.type}
+                </div>
+            `).join('');
+        }
+        
+        function selectScenario(card) {
+            if (card.classList.contains('matched')) return;
+            
+            document.querySelectorAll('.scenario-card').forEach(c => {
+                if (!c.classList.contains('matched')) {
+                    c.style.borderColor = 'var(--border-light)';
+                    c.style.background = 'var(--bg-secondary)';
+                }
+            });
+            
+            card.style.borderColor = 'var(--accent)';
+            card.style.background = 'rgba(232, 111, 81, 0.1)';
+            selectedScenario = card;
+            
+            checkMatch();
+        }
+        
+        function selectType(card) {
+            if (card.classList.contains('matched')) return;
+            
+            document.querySelectorAll('.type-card').forEach(c => {
+                if (!c.classList.contains('matched')) {
+                    c.style.borderColor = 'var(--border-light)';
+                    c.style.background = 'var(--bg-secondary)';
+                }
+            });
+            
+            card.style.borderColor = 'var(--info)';
+            card.style.background = 'rgba(24, 144, 255, 0.1)';
+            selectedType = card;
+            
+            checkMatch();
+        }
+        
+        function checkMatch() {
+            if (!selectedScenario || !selectedType) return;
+            
+            const scenarioType = selectedScenario.dataset.type;
+            const typeValue = selectedType.dataset.type;
+            
+            if (scenarioType === typeValue) {
+                // 匹配成功
+                selectedScenario.classList.add('matched');
+                selectedType.classList.add('matched');
+                selectedScenario.style.borderColor = 'var(--success)';
+                selectedScenario.style.background = 'rgba(82, 196, 26, 0.1)';
+                selectedType.style.borderColor = 'var(--success)';
+                selectedType.style.background = 'rgba(82, 196, 26, 0.1)';
+                selectedScenario.style.cursor = 'default';
+                selectedType.style.cursor = 'default';
+                
+                // 更新连接线
+                const lineIdx = matchedCount;
+                document.getElementById('line' + lineIdx).style.background = 'var(--success)';
+                
+                matchedCount++;
+                document.getElementById('matchScore').textContent = matchedCount;
+                matchedPairs.push(scenarioType);
+                
+                // 检查是否全部完成
+                if (matchedCount === 6) {
+                    document.getElementById('matchFeedback').style.display = 'block';
+                }
+            } else {
+                // 匹配失败
+                selectedScenario.style.borderColor = 'var(--error)';
+                selectedType.style.borderColor = 'var(--error)';
+                
+                setTimeout(() => {
+                    selectedScenario.style.borderColor = 'var(--border-light)';
+                    selectedScenario.style.background = 'var(--bg-secondary)';
+                    selectedType.style.borderColor = 'var(--border-light)';
+                    selectedType.style.background = 'var(--bg-secondary)';
+                }, 500);
+            }
+            
+            selectedScenario = null;
+            selectedType = null;
+        }
+        
+        function resetMatchingGame() {
+            initMatchingGame();
+        }
+        
+        // 初始化游戏
+        initMatchingGame();
+    </script>
+</body>
+</html>

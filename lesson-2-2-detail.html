@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.2 数据表设计与 ER 图 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .progress-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--bg-code);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-mini-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 24px 140px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb .current {
+            color: var(--text-secondary);
+        }
+
+        /* 课程头部 */
+        .lesson-header {
+            margin-bottom: 48px;
+        }
+
+        .lesson-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .lesson-type {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-code);
+            color: var(--text-secondary);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .lesson-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .lesson-intro {
+            font-size: 17px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 720px;
+        }
+
+        /* 内容区块 */
+        .content-section {
+            margin-bottom: 48px;
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        /* 高亮框 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .highlight-box li {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
+        /* ER 图容器 */
+        .er-diagram-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .er-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .er-toolbar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .er-toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .er-btn {
+            padding: 8px 16px;
+            background: var(--bg-code);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .er-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .er-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .er-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #FAFAF8 0%, #F5F3EF 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .er-canvas-wrapper:active {
+            cursor: grabbing;
+        }
+
+        #erCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 表详情侧边栏 */
+        .table-detail-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            z-index: 1100;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .table-detail-panel.open {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .panel-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--bg-code);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .panel-close:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .panel-content {
+            padding: 24px;
+        }
+
+        .table-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .table-meta-item {
+            padding: 6px 12px;
+            background: var(--bg-code);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 字段表格 */
+        .fields-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .fields-table th,
+        .fields-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+        }
+
+        .fields-table th {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-code);
+        }
+
+        .fields-table td {
+            color: var(--text-secondary);
+        }
+
+        .field-pk {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .field-fk {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: var(--info);
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .field-index {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: var(--success);
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* 图例 */
+        .er-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-code);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .legend-symbol {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 关系说明 */
+        .relation-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .relation-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s;
+        }
+
+        .relation-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .relation-symbol {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .relation-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .relation-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-code);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border-left: 4px solid var(--accent);
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .code-keyword { color: #D73A49; }
+        .code-string { color: #032F62; }
+        .code-comment { color: #6A737D; }
+        .code-function { color: #6F42C1; }
+
+        /* 底部栏 */
+        .footer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-back {
+            padding: 12px 24px;
+            background: var(--bg-code);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-primary {
+            padding: 14px 32px;
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            border-radius: 28px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(232, 111, 81, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 14px 32px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 28px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-code);
+            color: var(--text-primary);
+        }
+
+        /* 遮罩层 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 90px 16px 140px;
+            }
+
+            .lesson-header h1 {
+                font-size: 28px;
+            }
+
+            .table-detail-panel {
+                width: 100%;
+                right: -100%;
+            }
+
+            .er-canvas-wrapper {
+                height: 400px;
+            }
+
+            .footer-bar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .footer-right {
+                width: 100%;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="pm-tech-learning.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <div class="nav-actions">
+                <div class="progress-mini">
+                    <div class="progress-mini-bar">
+                        <div class="progress-mini-fill" id="progressBar"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 面包屑 -->
+        <nav class="breadcrumb">
+            <a href="pm-tech-learning.html">学习路径</a>
+            <span>/</span>
+            <a href="phase2-detail.html">阶段二</a>
+            <span>/</span>
+            <span class="current">2.2 数据表设计与 ER 图</span>
+        </nav>
+
+        <!-- 课程头部 -->
+        <header class="lesson-header">
+            <div class="lesson-meta-bar">
+                <span class="lesson-number-badge">📚 2.2</span>
+                <span class="lesson-type">⏱ 25分钟 · 🎯 实战练习</span>
+            </div>
+            <h1>数据表设计与 ER 图</h1>
+            <p class="lesson-intro">
+                学习如何设计规范的数据库表结构，掌握 ER 图（实体关系图）的绘制方法。通过电商订单系统的实战案例，
+                理解表与表之间的关联关系，为后续的数据分析和产品设计打下坚实基础。
+            </p>
+        </header>
+
+        <!-- 什么是 ER 图 -->
+        <section class="content-section">
+            <h2><span>📊</span> 什么是 ER 图</h2>
+            <p>
+                <strong>ER 图（Entity-Relationship Diagram）</strong>是数据库设计的核心工具，用于可视化地表示数据实体及其之间的关系。
+                它是产品经理与开发团队沟通数据结构的重要桥梁。
+            </p>
+            
+            <div class="highlight-box">
+                <h4>💡 为什么产品经理需要学 ER 图？</h4>
+                <ul>
+                    <li><strong>理解业务数据结构</strong>：清楚知道产品涉及哪些数据实体</li>
+                    <li><strong>评估功能可行性</strong>：判断某个功能是否需要新增数据表</li>
+                    <li><strong>优化产品方案</strong>：通过数据结构反推更合理的产品设计</li>
+                    <li><strong>高效沟通</strong>：用技术语言与开发团队讨论需求</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 关系类型说明 -->
+        <section class="content-section">
+            <h2><span>🔗</span> 实体关系类型</h2>
+            <p>在 ER 图中，实体之间存在三种基本关系类型，每种关系都有特定的符号表示：</p>
+            
+            <div class="relation-cards">
+                <div class="relation-card">
+                    <div class="relation-symbol">1:1</div>
+                    <div class="relation-name">一对一</div>
+                    <div class="relation-desc">一个实体对应另一个实体<br>如：用户与身份证</div>
+                </div>
+                <div class="relation-card">
+                    <div class="relation-symbol">1:N</div>
+                    <div class="relation-name">一对多</div>
+                    <div class="relation-desc">一个实体对应多个实体<br>如：用户与订单</div>
+                </div>
+                <div class="relation-card">
+                    <div class="relation-symbol">M:N</div>
+                    <div class="relation-name">多对多</div>
+                    <div class="relation-desc">多个实体互相映射<br>如：学生与课程</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 交互式 ER 图 -->
+        <section class="content-section">
+            <h2><span>🗺️</span> 电商订单系统 ER 图</h2>
+            <p>下面是一个典型电商订单系统的 ER 图示例。点击任意表节点可查看详细字段信息，使用工具栏按钮进行缩放和重置操作。</p>
+            
+            <div class="er-diagram-container">
+                <div class="er-toolbar">
+                    <div class="er-toolbar-title">
+                        <span>🎯</span>
+                        交互式 ER 图
+                    </div>
+                    <div class="er-toolbar-actions">
+                        <button class="er-btn" onclick="zoomIn()">🔍+ 放大</button>
+                        <button class="er-btn" onclick="zoomOut()">🔍- 缩小</button>
+                        <button class="er-btn" onclick="resetView()">⟲ 重置</button>
+                        <button class="er-btn" onclick="toggleDrag()" id="dragBtn">✋ 拖拽</button>
+                    </div>
+                </div>
+                <div class="er-canvas-wrapper" id="canvasWrapper">
+                    <canvas id="erCanvas"></canvas>
+                </div>
+                <div class="er-legend">
+                    <div class="legend-item">
+                        <div class="legend-symbol">🔑</div>
+                        <span>主键</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol">🔗</div>
+                        <span>外键</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol">📇</div>
+                        <span>索引</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol">—</div>
+                        <span>实线：强关联</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-symbol">- -</div>
+                        <span>虚线：弱关联</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>💡 使用提示</h4>
+                <ul>
+                    <li><strong>点击查看详情</strong>：点击任意表节点，右侧展开字段详细信息</li>
+                    <li><strong>拖拽移动</strong>：开启拖拽模式后可移动整个画布</li>
+                    <li><strong>缩放查看</strong>：使用放大缩小按钮调整视图比例</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 表设计规范 -->
+        <section class="content-section">
+            <h2><span>📋</span> 数据表设计规范</h2>
+            
+            <h3>1. 命名规范</h3>
+            <div class="code-block">
+                <pre>-- 表名使用小写 + 下划线，复数形式
+<span class="code-keyword">CREATE TABLE</span> <span class="code-string">`users`</span> (...);
+<span class="code-keyword">CREATE TABLE</span> <span class="code-string">`order_items`</span> (...);
+
+-- 字段名同样使用小写 + 下划线
+user_id, created_at, is_deleted</pre>
+            </div>
+
+            <h3>2. 必备字段（每个表都应该有）</h3>
+            <div class="code-block">
+                <pre><span class="code-keyword">CREATE TABLE</span> <span class="code-string">`example`</span> (
+    <span class="code-comment">-- 主键，自增</span>
+    <span class="code-string">`id`</span> <span class="code-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span>,
+    
+    <span class="code-comment">-- 业务字段...</span>
+    
+    <span class="code-comment">-- 创建时间</span>
+    <span class="code-string">`created_at`</span> <span class="code-keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    
+    <span class="code-comment">-- 更新时间</span>
+    <span class="code-string">`updated_at`</span> <span class="code-keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    
+    <span class="code-comment">-- 软删除标记（不用真正删除数据）</span>
+    <span class="code-string">`is_deleted`</span> <span class="code-keyword">TINYINT DEFAULT 0</span>,
+    
+    <span class="code-keyword">PRIMARY KEY</span> (<span class="code-string">`id`</span>)
+) <span class="code-keyword">ENGINE</span>=<span class="code-string">InnoDB</span>;</pre>
+            </div>
+
+            <h3>3. 字段类型选择指南</h3>
+            <div class="highlight-box">
+                <h4>📐 常用字段类型对照</h4>
+                <ul>
+                    <li><strong>INT/BIGINT</strong>：整数，如 ID、数量、状态码</li>
+                    <li><strong>DECIMAL(10,2)</strong>：精确小数，如金额（不用 FLOAT）</li>
+                    <li><strong>VARCHAR(n)</strong>：短文本，如用户名、手机号（n ≤ 255）</li>
+                    <li><strong>TEXT</strong>：长文本，如商品详情、评论内容</li>
+                    <li><strong>DATETIME/TIMESTAMP</strong>：日期时间，如创建时间</li>
+                    <li><strong>BOOLEAN/TINYINT</strong>：布尔值，如是否启用、是否删除</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 设计案例 -->
+        <section class="content-section">
+            <h2><span>📝</span> 实战案例：订单模块设计</h2>
+            <p>以电商订单为例，展示完整的数据表设计过程：</p>
+
+            <h3>Step 1：识别实体</h3>
+            <p>订单模块涉及的主要实体：用户、商品、订单、订单项、收货地址</p>
+
+            <h3>Step 2：确定关系</h3>
+            <ul style="margin-left: 20px; color: var(--text-secondary);">
+                <li>一个用户有多个订单（1:N）</li>
+                <li>一个订单包含多个商品（通过订单项关联，1:N）</li>
+                <li>一个用户有多个收货地址（1:N）</li>
+            </ul>
+
+            <h3>Step 3：定义字段</h3>
+            <div class="code-block">
+                <pre><span class="code-comment">-- 订单表</span>
+<span class="code-keyword">CREATE TABLE</span> <span class="code-string">`orders`</span> (
+    <span class="code-string">`id`</span> <span class="code-keyword">BIGINT UNSIGNED NOT NULL AUTO_INCREMENT</span>,
+    <span class="code-string">`order_no`</span> <span class="code-keyword">VARCHAR</span>(32) <span class="code-keyword">NOT NULL COMMENT</span> <span class="code-string">'订单编号'</span>,
+    <span class="code-string">`user_id`</span> <span class="code-keyword">BIGINT UNSIGNED NOT NULL COMMENT</span> <span class="code-string">'用户ID'</span>,
+    <span class="code-string">`total_amount`</span> <span class="code-keyword">DECIMAL</span>(10,2) <span class="code-keyword">NOT NULL COMMENT</span> <span class="code-string">'订单总金额'</span>,
+    <span class="code-string">`status`</span> <span class="code-keyword">TINYINT DEFAULT 1 COMMENT</span> <span class="code-string">'订单状态:1待付款 2待发货 3待收货 4已完成'</span>,
+    <span class="code-string">`pay_time`</span> <span class="code-keyword">DATETIME DEFAULT NULL COMMENT</span> <span class="code-string">'支付时间'</span>,
+    <span class="code-string">`created_at`</span> <span class="code-keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+    <span class="code-string">`updated_at`</span> <span class="code-keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="code-keyword">PRIMARY KEY</span> (<span class="code-string">`id`</span>),
+    <span class="code-keyword">UNIQUE KEY</span> <span class="code-string">`uk_order_no`</span> (<span class="code-string">`order_no`</span>),
+    <span class="code-keyword">KEY</span> <span class="code-string">`idx_user_id`</span> (<span class="code-string">`user_id`</span>),
+    <span class="code-keyword">KEY</span> <span class="code-string">`idx_status_created`</span> (<span class="code-string">`status`</span>, <span class="code-string">`created_at`</span>)
+) <span class="code-keyword">ENGINE</span>=<span class="code-string">InnoDB COMMENT</span>=<span class="code-string">'订单表'</span>;</pre>
+            </div>
+        </section>
+
+        <!-- 产品经理要点 -->
+        <section class="content-section">
+            <h2><span>🎯</span> 产品经理必知要点</h2>
+            
+            <div class="highlight-box">
+                <h4>✅ 表设计检查清单</h4>
+                <ul>
+                    <li>每个表都有自增主键 ID 吗？</li>
+                    <li>是否包含了 created_at 和 updated_at 字段？</li>
+                    <li>是否需要软删除（is_deleted）？</li>
+                    <li>外键关联是否正确建立了索引？</li>
+                    <li>金额字段是否使用 DECIMAL 而非 FLOAT？</li>
+                    <li>表和字段是否有清晰的注释说明？</li>
+                </ul>
+            </div>
+
+            <p>
+                <strong>数据建模是产品设计的底层能力。</strong>掌握 ER 图和数据表设计，
+                能让你在产品方案讨论中更有底气，也能更好地预估功能开发的工作量。
+            </p>
+        </section>
+    </main>
+
+    <!-- 遮罩层 -->
+    <div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+    <!-- 表详情侧边栏 -->
+    <aside class="table-detail-panel" id="detailPanel">
+        <div class="panel-header">
+            <h3 class="panel-title" id="panelTitle">表名</h3>
+            <button class="panel-close" onclick="closePanel()">×</button>
+        </div>
+        <div class="panel-content" id="panelContent">
+            <!-- 动态填充 -->
+        </div>
+    </aside>
+
+    <!-- 底部栏 -->
+    <footer class="footer-bar">
+        <div class="footer-left">
+            <a href="lesson-2-1-detail.html" class="btn-back">← 上一课</a>
+        </div>
+        <div class="footer-right">
+            <button class="btn-secondary" onclick="saveProgress()">💾 保存进度</button>
+            <button class="btn-primary" onclick="completeLesson()">
+                完成学习
+                <span>✓</span>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // 表结构数据
+        const tableData = {
+            users: {
+                name: 'users',
+                comment: '用户表',
+                engine: 'InnoDB',
+                fields: [
+                    { name: 'id', type: 'BIGINT', length: 'UNSIGNED', pk: true, comment: '主键ID' },
+                    { name: 'username', type: 'VARCHAR', length: '50', index: true, comment: '用户名' },
+                    { name: 'email', type: 'VARCHAR', length: '100', index: true, comment: '邮箱' },
+                    { name: 'phone', type: 'VARCHAR', length: '20', comment: '手机号' },
+                    { name: 'password_hash', type: 'VARCHAR', length: '255', comment: '密码哈希' },
+                    { name: 'avatar', type: 'VARCHAR', length: '255', comment: '头像URL' },
+                    { name: 'status', type: 'TINYINT', length: 'DEFAULT 1', comment: '状态:1正常 0禁用' },
+                    { name: 'created_at', type: 'TIMESTAMP', comment: '创建时间' },
+                    { name: 'updated_at', type: 'TIMESTAMP', comment: '更新时间' }
+                ]
+            },
+            orders: {
+                name: 'orders',
+                comment: '订单表',
+                engine: 'InnoDB',
+                fields: [
+                    { name: 'id', type: 'BIGINT', length: 'UNSIGNED', pk: true, comment: '主键ID' },
+                    { name: 'order_no', type: 'VARCHAR', length: '32', index: true, comment: '订单编号' },
+                    { name: 'user_id', type: 'BIGINT', length: 'UNSIGNED', fk: 'users.id', index: true, comment: '用户ID' },
+                    { name: 'address_id', type: 'BIGINT', length: 'UNSIGNED', fk: 'addresses.id', comment: '收货地址ID' },
+                    { name: 'total_amount', type: 'DECIMAL', length: '10,2', comment: '订单总金额' },
+                    { name: 'discount_amount', type: 'DECIMAL', length: '10,2', comment: '优惠金额' },
+                    { name: 'pay_amount', type: 'DECIMAL', length: '10,2', comment: '实付金额' },
+                    { name: 'status', type: 'TINYINT', length: 'DEFAULT 1', index: true, comment: '订单状态' },
+                    { name: 'pay_time', type: 'DATETIME', comment: '支付时间' },
+                    { name: 'created_at', type: 'TIMESTAMP', comment: '创建时间' }
+                ]
+            },
+            order_items: {
+                name: 'order_items',
+                comment: '订单项表',
+                engine: 'InnoDB',
+                fields: [
+                    { name: 'id', type: 'BIGINT', length: 'UNSIGNED', pk: true, comment: '主键ID' },
+                    { name: 'order_id', type: 'BIGINT', length: 'UNSIGNED', fk: 'orders.id', index: true, comment: '订单ID' },
+                    { name: 'product_id', type: 'BIGINT', length: 'UNSIGNED', fk: 'products.id', comment: '商品ID' },
+                    { name: 'product_name', type: 'VARCHAR', length: '200', comment: '商品名称(快照)' },
+                    { name: 'product_image', type: 'VARCHAR', length: '255', comment: '商品图片(快照)' },
+                    { name: 'price', type: 'DECIMAL', length: '10,2', comment: '单价' },
+                    { name: 'quantity', type: 'INT', length: 'UNSIGNED', comment: '数量' },
+                    { name: 'subtotal', type: 'DECIMAL', length: '10,2', comment: '小计金额' },
+                    { name: 'created_at', type: 'TIMESTAMP', comment: '创建时间' }
+                ]
+            },
+            products: {
+                name: 'products',
+                comment: '商品表',
+                engine: 'InnoDB',
+                fields: [
+                    { name: 'id', type: 'BIGINT', length: 'UNSIGNED', pk: true, comment: '主键ID' },
+                    { name: 'product_code', type: 'VARCHAR', length: '50', index: true, comment: '商品编码' },
+                    { name: 'name', type: 'VARCHAR', length: '200', index: true, comment: '商品名称' },
+                    { name: 'category_id', type: 'BIGINT', length: 'UNSIGNED', fk: 'categories.id', comment: '分类ID' },
+                    { name: 'description', type: 'TEXT', comment: '商品描述' },
+                    { name: 'price', type: 'DECIMAL', length: '10,2', comment: '售价' },
+                    { name: 'stock', type: 'INT', length: 'UNSIGNED', comment: '库存' },
+                    { name: 'status', type: 'TINYINT', length: 'DEFAULT 1', comment: '状态:1上架 0下架' },
+                    { name: 'created_at', type: 'TIMESTAMP', comment: '创建时间' }
+                ]
+            },
+            addresses: {
+                name: 'addresses',
+                comment: '收货地址表',
+                engine: 'InnoDB',
+                fields: [
+                    { name: 'id', type: 'BIGINT', length: 'UNSIGNED', pk: true, comment: '主键ID' },
+                    { name: 'user_id', type: 'BIGINT', length: 'UNSIGNED', fk: 'users.id', index: true, comment: '用户ID' },
+                    { name: 'receiver_name', type: 'VARCHAR', length: '50', comment: '收货人姓名' },
+                    { name: 'phone', type: 'VARCHAR', length: '20', comment: '手机号' },
+                    { name: 'province', type: 'VARCHAR', length: '50', comment: '省' },
+                    { name: 'city', type: 'VARCHAR', length: '50', comment: '市' },
+                    { name: 'district', type: 'VARCHAR', length: '50', comment: '区' },
+                    { name: 'detail', type: 'VARCHAR', length: '255', comment: '详细地址' },
+                    { name: 'is_default', type: 'TINYINT', length: 'DEFAULT 0', comment: '是否默认地址' },
+                    { name: 'created_at', type: 'TIMESTAMP', comment: '创建时间' }
+                ]
+            }
+        };
+
+        // ER 图节点位置
+        const nodes = [
+            { id: 'users', name: 'users\n用户', x: 100, y: 150, width: 120, height: 70 },
+            { id: 'orders', name: 'orders\n订单', x: 350, y: 80, width: 120, height: 70 },
+            { id: 'order_items', name: 'order_items\n订单项', x: 600, y: 80, width: 130, height: 70 },
+            { id: 'products', name: 'products\n商品', x: 600, y: 250, width: 120, height: 70 },
+            { id: 'addresses', name: 'addresses\n地址', x: 350, y: 250, width: 120, height: 70 }
+        ];
+
+        // 关系连线
+        const relations = [
+            { from: 'users', to: 'orders', type: '1:N', label: '拥有' },
+            { from: 'orders', to: 'order_items', type: '1:N', label: '包含' },
+            { from: 'order_items', to: 'products', type: 'N:1', label: '关联' },
+            { from: 'users', to: 'addresses', type: '1:N', label: '拥有' },
+            { from: 'orders', to: 'addresses', type: 'N:1', label: '使用' }
+        ];
+
+        // Canvas 相关变量
+        let canvas, ctx;
+        let scale = 1;
+        let offsetX = 0, offsetY = 0;
+        let isDragging = false;
+        let dragEnabled = false;
+        let lastX, lastY;
+        let selectedNode = null;
+
+        // 初始化 Canvas
+        function initCanvas() {
+            canvas = document.getElementById('erCanvas');
+            ctx = canvas.getContext('2d');
+            
+            const wrapper = document.getElementById('canvasWrapper');
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+            
+            // 居中显示
+            offsetX = (canvas.width - 750) / 2;
+            offsetY = (canvas.height - 350) / 2;
+            
+            draw();
+            
+            // 事件监听
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('click', handleClick);
+            canvas.addEventListener('wheel', handleWheel);
+            
+            window.addEventListener('resize', () => {
+                canvas.width = wrapper.clientWidth;
+                canvas.height = wrapper.clientHeight;
+                draw();
+            });
+        }
+
+        // 绘制 ER 图
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+            
+            // 绘制连线
+            relations.forEach(rel => {
+                const fromNode = nodes.find(n => n.id === rel.from);
+                const toNode = nodes.find(n => n.id === rel.to);
+                drawRelation(fromNode, toNode, rel);
+            });
+            
+            // 绘制节点
+            nodes.forEach(node => {
+                drawNode(node);
+            });
+            
+            ctx.restore();
+        }
+
+        // 绘制节点
+        function drawNode(node) {
+            const isSelected = selectedNode === node.id;
+            
+            // 外发光
+            if (isSelected) {
+                ctx.shadowColor = 'rgba(232, 111, 81, 0.4)';
+                ctx.shadowBlur = 20;
+            }
+            
+            // 节点背景
+            ctx.fillStyle = isSelected ? '#FFF8F6' : '#FFFFFF';
+            ctx.strokeStyle = isSelected ? '#E86F51' : '#E0DDD8';
+            ctx.lineWidth = isSelected ? 3 : 2;
+            
+            // 圆角矩形
+            roundRect(ctx, node.x, node.y, node.width, node.height, 10);
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.shadowBlur = 0;
+            
+            // 顶部色条
+            ctx.fillStyle = '#E86F51';
+            ctx.beginPath();
+            ctx.roundRect(node.x, node.y, node.width, 6, [10, 10, 0, 0]);
+            ctx.fill();
+            
+            // 文字
+            ctx.fillStyle = '#2D2A26';
+            ctx.font = 'bold 14px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const lines = node.name.split('\n');
+            lines.forEach((line, i) => {
+                ctx.fillText(line, node.x + node.width/2, node.y + 25 + i * 20);
+            });
+            
+            // 主键图标
+            ctx.fillStyle = '#E86F51';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('🔑', node.x + 15, node.y + 25);
+        }
+
+        // 绘制关系连线
+        function drawRelation(from, to, rel) {
+            const start = getEdgePoint(from, to);
+            const end = getEdgePoint(to, from);
+            
+            ctx.strokeStyle = '#9A9590';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+            
+            // 关系标签
+            const midX = (start.x + end.x) / 2;
+            const midY = (start.y + end.y) / 2;
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(midX - 25, midY - 12, 50, 24);
+            
+            ctx.strokeStyle = '#E86F51';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(midX - 25, midY - 12, 50, 24);
+            
+            ctx.fillStyle = '#E86F51';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(rel.type, midX, midY);
+        }
+
+        // 获取边缘点
+        function getEdgePoint(from, to) {
+            const dx = to.x + to.width/2 - (from.x + from.width/2);
+            const dy = to.y + to.height/2 - (from.y + from.height/2);
+            const angle = Math.atan2(dy, dx);
+            
+            const halfWidth = from.width / 2;
+            const halfHeight = from.height / 2;
+            
+            let x, y;
+            if (Math.abs(dx) * halfHeight > Math.abs(dy) * halfWidth) {
+                x = dx > 0 ? from.x + from.width : from.x;
+                y = from.y + from.height/2 + Math.tan(angle) * (x - (from.x + from.width/2));
+            } else {
+                y = dy > 0 ? from.y + from.height : from.y;
+                x = from.x + from.width/2 + (y - (from.y + from.height/2)) / Math.tan(angle);
+            }
+            
+            return { x: x || from.x + from.width/2, y: y || from.y + from.height/2 };
+        }
+
+        // 圆角矩形
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        // 鼠标事件处理
+        function handleMouseDown(e) {
+            if (!dragEnabled) return;
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        }
+
+        function handleMouseMove(e) {
+            if (!isDragging || !dragEnabled) return;
+            
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
+            
+            offsetX += dx;
+            offsetY += dy;
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+            
+            draw();
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+        }
+
+        function handleClick(e) {
+            if (isDragging) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left - offsetX) / scale;
+            const y = (e.clientY - rect.top - offsetY) / scale;
+            
+            const clickedNode = nodes.find(node => 
+                x >= node.x && x <= node.x + node.width &&
+                y >= node.y && y <= node.y + node.height
+            );
+            
+            if (clickedNode) {
+                selectedNode = clickedNode.id;
+                showTableDetail(clickedNode.id);
+                draw();
+            } else {
+                selectedNode = null;
+                draw();
+            }
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.max(0.5, Math.min(2, scale * delta));
+            draw();
+        }
+
+        // 工具栏功能
+        function zoomIn() {
+            scale = Math.min(2, scale * 1.2);
+            draw();
+        }
+
+        function zoomOut() {
+            scale = Math.max(0.5, scale / 1.2);
+            draw();
+        }
+
+        function resetView() {
+            scale = 1;
+            const wrapper = document.getElementById('canvasWrapper');
+            offsetX = (wrapper.clientWidth - 750) / 2;
+            offsetY = (wrapper.clientHeight - 350) / 2;
+            draw();
+        }
+
+        function toggleDrag() {
+            dragEnabled = !dragEnabled;
+            document.getElementById('dragBtn').classList.toggle('active', dragEnabled);
+            document.getElementById('canvasWrapper').style.cursor = dragEnabled ? 'grab' : 'default';
+        }
+
+        // 显示表详情
+        function showTableDetail(tableId) {
+            const table = tableData[tableId];
+            if (!table) return;
+            
+            document.getElementById('panelTitle').textContent = table.name + ' (' + table.comment + ')';
+            
+            const metaHtml = `
+                <div class="table-meta">
+                    <span class="table-meta-item">引擎: ${table.engine}</span>
+                    <span class="table-meta-item">字段数: ${table.fields.length}</span>
+                </div>
+                <table class="fields-table">
+                    <thead>
+                        <tr>
+                            <th>字段名</th>
+                            <th>类型</th>
+                            <th>约束</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${table.fields.map(field => `
+                            <tr>
+                                <td><code>${field.name}</code></td>
+                                <td>${field.type}${field.length ? '(' + field.length + ')' : ''}</td>
+                                <td>
+                                    ${field.pk ? '<span class="field-pk">🔑 PK</span>' : ''}
+                                    ${field.fk ? '<span class="field-fk">🔗 FK</span>' : ''}
+                                    ${field.index && !field.pk ? '<span class="field-index">📇 IDX</span>' : ''}
+                                </td>
+                                <td>${field.comment}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('panelContent').innerHTML = metaHtml;
+            document.getElementById('detailPanel').classList.add('open');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closePanel() {
+            document.getElementById('detailPanel').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+            selectedNode = null;
+            draw();
+        }
+
+        // 进度追踪
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = Math.round((scrollTop / docHeight) * 100);
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+
+        // 保存进度
+        function saveProgress() {
+            const progress = document.getElementById('progressText').textContent;
+            localStorage.setItem('lesson2_2_progress', progress);
+            alert('进度已保存！当前进度：' + progress);
+        }
+
+        // 完成学习
+        function completeLesson() {
+            localStorage.setItem('lesson2_2_completed', 'true');
+            localStorage.setItem('lesson2_2_progress', '100%');
+            
+            const btn = document.querySelector('.btn-primary');
+            btn.innerHTML = '已完成 ✓';
+            btn.style.background = '#52C41A';
+            
+            setTimeout(() => {
+                if (confirm('恭喜你完成本课学习！是否返回课程列表？')) {
+                    window.location.href = 'phase2-detail.html';
+                }
+            }, 500);
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            initCanvas();
+            updateProgress();
+            
+            // 恢复进度
+            const savedProgress = localStorage.getItem('lesson2_2_progress');
+            if (savedProgress) {
+                document.getElementById('progressBar').style.width = savedProgress;
+                document.getElementById('progressText').textContent = savedProgress;
+            }
+            
+            // 检查是否已完成
+            if (localStorage.getItem('lesson2_2_completed') === 'true') {
+                const btn = document.querySelector('.btn-primary');
+                btn.innerHTML = '已完成 ✓';
+                btn.style.background = '#52C41A';
+            }
+        });
+    </script>
+</body>
+</html>

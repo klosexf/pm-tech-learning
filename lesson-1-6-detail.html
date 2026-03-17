@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.6 阶段实战：绘制系统架构图 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .progress-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--bg-code);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-mini-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--success);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb .current {
+            color: var(--text-secondary);
+        }
+
+        /* 课程头部 */
+        .lesson-header {
+            margin-bottom: 48px;
+        }
+
+        .lesson-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .lesson-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--accent);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
+        .lesson-type {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lesson-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .lesson-intro {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 680px;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .content-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-primary);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.9;
+        }
+
+        /* 任务卡片 */
+        .task-card {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 16px 16px 0;
+            padding: 28px;
+            margin: 28px 0;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .task-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .task-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .task-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .task-requirements {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .task-requirements h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .task-requirements ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-requirements li {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .task-requirements li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 16px;
+        }
+
+        .task-requirements li.completed::before {
+            content: '☑';
+            color: var(--success);
+        }
+
+        /* 架构图画布区域 */
+        .canvas-container {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 28px 0;
+            min-height: 500px;
+        }
+
+        .canvas-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .tool-btn {
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .tool-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tool-btn.secondary {
+            background: transparent;
+            border-color: var(--border-light);
+        }
+
+        /* 绘图区域 */
+        .drawing-area {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+            border: 2px dashed var(--border-light);
+        }
+
+        .drawing-area.drag-over {
+            border-color: var(--accent);
+            background: rgba(232, 111, 81, 0.05);
+        }
+
+        /* 组件面板 */
+        .components-panel {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .component-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            cursor: grab;
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+
+        .component-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .component-item:active {
+            cursor: grabbing;
+        }
+
+        .component-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .component-icon.client {
+            background: rgba(24, 144, 255, 0.1);
+        }
+
+        .component-icon.server {
+            background: rgba(232, 111, 81, 0.1);
+        }
+
+        .component-icon.database {
+            background: rgba(82, 196, 26, 0.1);
+        }
+
+        .component-icon.cache {
+            background: rgba(250, 173, 20, 0.1);
+        }
+
+        .component-icon.gateway {
+            background: rgba(156, 105, 226, 0.1);
+        }
+
+        .component-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* 画布上的元素 */
+        .canvas-element {
+            position: absolute;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-soft);
+            border: 2px solid transparent;
+            cursor: move;
+            min-width: 120px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .canvas-element:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .canvas-element.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(232, 111, 81, 0.2);
+        }
+
+        .canvas-element .element-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .canvas-element .element-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .canvas-element .element-type {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* 连接线 */
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: var(--text-muted);
+            transform-origin: left center;
+        }
+
+        .connection-line.active {
+            background: var(--accent);
+        }
+
+        /* 属性面板 */
+        .properties-panel {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .properties-panel h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .property-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .property-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .property-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .property-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* 示例架构图 */
+        .example-diagram {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 28px 0;
+        }
+
+        .example-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .architecture-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .arch-layer {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .arch-layer.presentation {
+            border-left-color: var(--info);
+        }
+
+        .arch-layer.application {
+            border-left-color: var(--accent);
+        }
+
+        .arch-layer.data {
+            border-left-color: var(--success);
+        }
+
+        .arch-layer-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--bg-primary);
+        }
+
+        .arch-layer-content {
+            flex: 1;
+        }
+
+        .arch-layer-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .arch-layer-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .arch-components {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .arch-component-tag {
+            padding: 6px 12px;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 提交区域 */
+        .submit-section {
+            background: linear-gradient(135deg, rgba(82, 196, 26, 0.08) 0%, rgba(56, 158, 13, 0.08) 100%);
+            border-left: 4px solid var(--success);
+            border-radius: 0 16px 16px 0;
+            padding: 28px;
+            margin: 28px 0;
+        }
+
+        .submit-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .btn-primary {
+            padding: 14px 32px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #d55a3d;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(232, 111, 81, 0.3);
+        }
+
+        /* 重点框 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box p, .highlight-box li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .highlight-box li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* 底部操作栏 */
+        .lesson-footer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        .footer-bar-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-complete {
+            padding: 12px 32px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-complete:hover {
+            background: #389E0D;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+        }
+
+        /* 页面底部留白 */
+        .page-end-spacer {
+            height: 100px;
+        }
+
+        /* 提示信息 */
+        .tip-box {
+            background: rgba(24, 144, 255, 0.08);
+            border-left: 4px solid var(--info);
+            border-radius: 0 12px 12px 0;
+            padding: 16px 20px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .tip-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .tip-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 90px 16px 100px;
+            }
+
+            .lesson-header h1 {
+                font-size: 26px;
+            }
+
+            .content-section {
+                padding: 24px;
+            }
+
+            .canvas-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-group {
+                justify-content: center;
+            }
+
+            .components-panel {
+                justify-content: center;
+            }
+
+            .arch-layer {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-bar-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-complete {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-section {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .canvas-element {
+            animation: fadeIn 0.3s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="pm-tech-learning.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <div class="nav-actions">
+                <div class="progress-mini">
+                    <span>课程进度</span>
+                    <div class="progress-mini-bar">
+                        <div class="progress-mini-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 面包屑 -->
+        <nav class="breadcrumb">
+            <a href="pm-tech-learning.html">学习路径</a>
+            <span>›</span>
+            <a href="phase1-detail.html">阶段一</a>
+            <span>›</span>
+            <span class="current">1.6 阶段实战：绘制系统架构图</span>
+        </nav>
+
+        <!-- 课程头部 -->
+        <header class="lesson-header">
+            <div class="lesson-meta-bar">
+                <span class="lesson-number-badge">1.6</span>
+                <span class="lesson-type">🎯 实战练习 · ⏱ 30分钟</span>
+            </div>
+            <h1>阶段实战：绘制系统架构图</h1>
+            <p class="lesson-intro">
+                通过动手绘制电商系统的架构图，将前面学习的理论知识转化为实践能力。掌握系统架构图的绘制方法和规范，提升技术方案的可视化表达能力。
+            </p>
+        </header>
+
+        <!-- 第一节：实战任务 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎯</span>
+                实战任务
+            </h2>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <div class="task-icon">🛍️</div>
+                    <div class="task-title">绘制电商系统架构图</div>
+                </div>
+                <div class="task-desc">
+                    假设你要负责一个电商App的产品设计，请绘制该系统的技术架构图。需要包含用户端、服务端、数据层等核心模块，并展示它们之间的数据流转关系。
+                </div>
+                <div class="task-requirements">
+                    <h4>任务要求清单</h4>
+                    <ul id="taskChecklist">
+                        <li data-check="1">包含至少3个层级（展示层、应用层、数据层）</li>
+                        <li data-check="2">标注各模块的职责和主要功能</li>
+                        <li data-check="3">画出模块间的数据流向</li>
+                        <li data-check="4">包含外部依赖（如支付、短信服务）</li>
+                        <li data-check="5">为架构图添加简洁的文字说明</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-icon">💡</span>
+                <div class="tip-content">
+                    <strong>绘图提示：</strong>你可以使用下方的简易绘图工具进行练习，也可以在纸上手绘后拍照上传，或使用 ProcessOn、Draw.io 等专业工具绘制后分享链接。
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二节：架构图示例 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📐</span>
+                参考架构：经典三层架构
+            </h2>
+
+            <p>
+                在动手绘制之前，先了解一种经典的系统架构模式——三层架构。这是大多数互联网产品的基础架构模型。
+            </p>
+
+            <div class="example-diagram">
+                <div class="example-title">电商系统架构示例</div>
+                <div class="architecture-layers">
+                    <div class="arch-layer presentation">
+                        <div class="arch-layer-icon">📱</div>
+                        <div class="arch-layer-content">
+                            <div class="arch-layer-title">展示层（Presentation Layer）</div>
+                            <div class="arch-layer-desc">用户直接接触的部分，负责界面渲染和交互响应</div>
+                            <div class="arch-components">
+                                <span class="arch-component-tag">iOS App</span>
+                                <span class="arch-component-tag">Android App</span>
+                                <span class="arch-component-tag">Web 网页</span>
+                                <span class="arch-component-tag">小程序</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arch-layer application">
+                        <div class="arch-layer-icon">⚙️</div>
+                        <div class="arch-layer-content">
+                            <div class="arch-layer-title">应用层（Application Layer）</div>
+                            <div class="arch-layer-desc">核心业务逻辑处理，协调各模块完成业务流程</div>
+                            <div class="arch-components">
+                                <span class="arch-component-tag">用户服务</span>
+                                <span class="arch-component-tag">商品服务</span>
+                                <span class="arch-component-tag">订单服务</span>
+                                <span class="arch-component-tag">支付服务</span>
+                                <span class="arch-component-tag">消息队列</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arch-layer data">
+                        <div class="arch-layer-icon">🗄️</div>
+                        <div class="arch-layer-content">
+                            <div class="arch-layer-title">数据层（Data Layer）</div>
+                            <div class="arch-layer-desc">数据持久化存储和管理，保障数据安全与一致性</div>
+                            <div class="arch-components">
+                                <span class="arch-component-tag">MySQL</span>
+                                <span class="arch-component-tag">Redis</span>
+                                <span class="arch-component-tag">Elasticsearch</span>
+                                <span class="arch-component-tag">对象存储</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>📊 架构图绘制要点</h4>
+                <ul>
+                    <li><strong>分层清晰</strong>：从上至下或从左至右展示层级关系</li>
+                    <li><strong>职责明确</strong>：每个模块标注核心功能和职责</li>
+                    <li><strong>流向清楚</strong>：用箭头表示数据和请求的流向</li>
+                    <li><strong>简洁易懂</strong>：避免过度设计，保持图表可读性</li>
+                    <li><strong>考虑扩展</strong>：预留未来可能新增的模块位置</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第三节：交互式绘图工具 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🎨</span>
+                简易架构图绘制工具
+            </h2>
+
+            <p>
+                使用下方工具练习绘制架构图。拖拽组件到画布，双击可编辑文本，点击选中后可调整位置。
+            </p>
+
+            <!-- 架构模板库 -->
+            <div style="background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(232, 111, 81, 0.08) 100%); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+                <h4 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">📚</span>
+                    架构模板库
+                </h4>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+                    选择一个预设模板快速开始，或从空白画布自由绘制
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <!-- 模板1：经典三层架构 -->
+                    <div class="template-card" data-template="three-tier" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; cursor: pointer; border: 2px solid var(--border-light); transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--info) 0%, var(--accent) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">🏢</div>
+                            <div>
+                                <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">三层架构</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">经典模式</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            展示层 → 业务层 → 数据层，适合大多数Web应用
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 12px;">
+                            <span style="padding: 4px 8px; background: rgba(24, 144, 255, 0.1); color: var(--info); font-size: 11px; border-radius: 10px;">入门推荐</span>
+                            <span style="padding: 4px 8px; background: rgba(82, 196, 26, 0.1); color: var(--success); font-size: 11px; border-radius: 10px;">Web应用</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 模板2：微服务架构 -->
+                    <div class="template-card" data-template="microservice" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; cursor: pointer; border: 2px solid var(--border-light); transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">🔧</div>
+                            <div>
+                                <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">微服务架构</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">分布式系统</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            多个独立服务协同工作，适合大型复杂系统
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 12px;">
+                            <span style="padding: 4px 8px; background: rgba(250, 173, 20, 0.1); color: var(--warning); font-size: 11px; border-radius: 10px;">中高级</span>
+                            <span style="padding: 4px 8px; background: rgba(232, 111, 81, 0.1); color: var(--accent); font-size: 11px; border-radius: 10px;">高可用</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 模板3：电商系统 -->
+                    <div class="template-card" data-template="ecommerce" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; cursor: pointer; border: 2px solid var(--border-light); transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--success) 0%, #389E0D 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">🛒</div>
+                            <div>
+                                <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">电商系统</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">行业案例</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            包含用户、商品、订单、支付等核心模块
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 12px;">
+                            <span style="padding: 4px 8px; background: rgba(82, 196, 26, 0.1); color: var(--success); font-size: 11px; border-radius: 10px;">实战练习</span>
+                            <span style="padding: 4px 8px; background: rgba(24, 144, 255, 0.1); color: var(--info); font-size: 11px; border-radius: 10px;">业务完整</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 模板4：空白画布 -->
+                    <div class="template-card" data-template="blank" style="background: var(--bg-secondary); border-radius: 12px; padding: 20px; cursor: pointer; border: 2px solid var(--border-light); transition: all 0.3s;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: var(--bg-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px dashed var(--border-light);">📝</div>
+                            <div>
+                                <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">空白画布</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">自由创作</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            从零开始绘制你的架构图
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 12px;">
+                            <span style="padding: 4px 8px; background: var(--bg-primary); color: var(--text-secondary); font-size: 11px; border-radius: 10px;">灵活自由</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <!-- 组件面板 -->
+                <div class="components-panel">
+                    <div class="component-item" draggable="true" data-type="client">
+                        <div class="component-icon client">📱</div>
+                        <span class="component-label">客户端</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="server">
+                        <div class="component-icon server">⚙️</div>
+                        <span class="component-label">服务器</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="database">
+                        <div class="component-icon database">🗄️</div>
+                        <span class="component-label">数据库</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="cache">
+                        <div class="component-icon cache">⚡</div>
+                        <span class="component-label">缓存</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="gateway">
+                        <div class="component-icon gateway">🌐</div>
+                        <span class="component-label">网关</span>
+                    </div>
+                </div>
+
+                <!-- 工具栏 -->
+                <div class="canvas-toolbar">
+                    <div class="toolbar-group">
+                        <button class="tool-btn" id="selectTool" title="选择工具">
+                            <span>👆</span> 选择
+                        </button>
+                        <button class="tool-btn" id="connectTool" title="连线工具">
+                            <span>🔗</span> 连线
+                        </button>
+                        <button class="tool-btn secondary" id="deleteTool" title="删除选中">
+                            <span>🗑️</span> 删除
+                        </button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="tool-btn secondary" id="clearCanvas" title="清空画布">
+                            <span>🔄</span> 清空
+                        </button>
+                        <button class="tool-btn" id="saveCanvas" title="保存图片">
+                            <span>💾</span> 保存
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 绘图区域 -->
+                <div class="drawing-area" id="drawingArea">
+                    <div class="canvas-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-muted); pointer-events: none;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🎨</div>
+                        <div style="font-size: 16px;">拖拽左侧组件到此处开始绘制</div>
+                        <div style="font-size: 13px; margin-top: 8px;">双击组件可编辑名称</div>
+                    </div>
+                </div>
+
+                <!-- 属性面板 -->
+                <div class="properties-panel" id="propertiesPanel" style="display: none;">
+                    <h4>组件属性</h4>
+                    <div class="property-row">
+                        <span class="property-label">名称</span>
+                        <input type="text" class="property-input" id="elementName" placeholder="输入组件名称">
+                    </div>
+                    <div class="property-row">
+                        <span class="property-label">类型</span>
+                        <input type="text" class="property-input" id="elementType" placeholder="输入组件类型" readonly>
+                    </div>
+                    <div class="property-row">
+                        <span class="property-label">描述</span>
+                        <input type="text" class="property-input" id="elementDesc" placeholder="输入功能描述">
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <span class="tip-icon">📝</span>
+                <div class="tip-content">
+                    <strong>操作指南：</strong>1) 拖拽组件到画布 2) 单击选中，双击编辑名称 3) 点击"连线"后连接两个组件 4) 完成后可截图保存
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四节：优秀作业参考 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">⭐</span>
+                优秀作业点评
+            </h2>
+
+            <p>
+                以下是往期学员的优秀架构图案例及点评，帮助你理解什么样的架构图更清晰有效。
+            </p>
+
+            <div class="highlight-box">
+                <h4>✅ 优秀案例特点</h4>
+                <ul>
+                    <li><strong>层次清晰</strong>：明确区分展示层、业务层、数据层</li>
+                    <li><strong>命名规范</strong>：使用准确的术语，如"用户服务"而非"用户相关的东西"</li>
+                    <li><strong>流向明确</strong>：用箭头标注请求方向，避免双向箭头造成混淆</li>
+                    <li><strong>重点突出</strong>：核心模块放大显示，次要模块简化</li>
+                    <li><strong>考虑全面</strong>：包含监控、日志、安全等支撑模块</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 20px;">
+                <h4>❌ 常见问题</h4>
+                <ul>
+                    <li><strong>过度复杂</strong>：试图在一个图中展示所有细节，导致可读性差</li>
+                    <li><strong>职责不清</strong>：模块命名模糊，无法从名称判断功能</li>
+                    <li><strong>缺少流向</strong>：只有模块罗列，没有展示如何协作</li>
+                    <li><strong>技术堆砌</strong>：为了显得专业而堆砌技术名词</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第五节：提交作业 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📤</span>
+                提交你的作品
+            </h2>
+
+            <div class="submit-section">
+                <div class="submit-title">
+                    <span>🎉</span>
+                    完成实战练习
+                </div>
+                <div class="submit-desc">
+                    恭喜你完成了阶段一的最后一个任务！请将你的架构图截图或拍照上传，系统会自动保存你的学习进度。你的作品也可以分享给导师和同学获得反馈。
+                </div>
+                <button class="btn-primary" onclick="submitWork()">
+                    <span>📤</span>
+                    提交作业
+                </button>
+            </div>
+        </section>
+
+        <!-- 底部留白 -->
+        <div class="page-end-spacer"></div>
+    </main>
+
+    <!-- 底部操作栏 -->
+    <div class="lesson-footer-bar">
+        <div class="footer-bar-content">
+            <div class="footer-nav">
+                <a href="lesson-1-5-detail.html" class="btn-nav">← 上一课</a>
+                <a href="phase1-detail.html" class="btn-nav">课程列表</a>
+            </div>
+            <button class="btn-complete" onclick="markComplete()">
+                <span>✓</span>
+                <span>标记为已完成</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 进度追踪
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollProgress = Math.round((scrollTop / docHeight) * 100);
+            
+            document.getElementById('progressFill').style.width = scrollProgress + '%';
+            document.getElementById('progressText').textContent = scrollProgress + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+
+        // 画布功能
+        let selectedElement = null;
+        let isConnectMode = false;
+        let elementCount = 0;
+
+        const drawingArea = document.getElementById('drawingArea');
+        const propertiesPanel = document.getElementById('propertiesPanel');
+
+        // 拖拽组件到画布
+        document.querySelectorAll('.component-item').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('componentType', item.dataset.type);
+                e.dataTransfer.setData('componentIcon', item.querySelector('.component-icon').textContent);
+                e.dataTransfer.setData('componentLabel', item.querySelector('.component-label').textContent);
+            });
+        });
+
+        drawingArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            drawingArea.classList.add('drag-over');
+        });
+
+        drawingArea.addEventListener('dragleave', () => {
+            drawingArea.classList.remove('drag-over');
+        });
+
+        drawingArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            drawingArea.classList.remove('drag-over');
+            
+            // 隐藏占位符
+            const placeholder = drawingArea.querySelector('.canvas-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+
+            const type = e.dataTransfer.getData('componentType');
+            const icon = e.dataTransfer.getData('componentIcon');
+            const label = e.dataTransfer.getData('componentLabel');
+
+            createCanvasElement(e.offsetX, e.offsetY, type, icon, label);
+        });
+
+        // 创建画布元素
+        function createCanvasElement(x, y, type, icon, label) {
+            elementCount++;
+            const element = document.createElement('div');
+            element.className = 'canvas-element';
+            element.id = `element-${elementCount}`;
+            element.style.left = `${x - 60}px`;
+            element.style.top = `${y - 40}px`;
+            element.dataset.type = type;
+            element.innerHTML = `
+                <div class="element-icon">${icon}</div>
+                <div class="element-label" contenteditable="false">${label}</div>
+                <div class="element-type">${type}</div>
+            `;
+
+            // 点击选中
+            element.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectElement(element);
+            });
+
+            // 双击编辑
+            element.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                const labelEl = element.querySelector('.element-label');
+                labelEl.contentEditable = true;
+                labelEl.focus();
+                labelEl.style.outline = 'none';
+                labelEl.style.borderBottom = '2px solid var(--accent)';
+            });
+
+            // 编辑完成
+            element.querySelector('.element-label').addEventListener('blur', function() {
+                this.contentEditable = false;
+                this.style.borderBottom = 'none';
+            });
+
+            // 拖拽移动
+            let isDragging = false;
+            let startX, startY, startLeft, startTop;
+
+            element.addEventListener('mousedown', (e) => {
+                if (e.target.isContentEditable) return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = parseInt(element.style.left);
+                startTop = parseInt(element.style.top);
+                element.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                element.style.left = `${startLeft + dx}px`;
+                element.style.top = `${startTop + dy}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                element.style.cursor = 'move';
+            });
+
+            drawingArea.appendChild(element);
+            selectElement(element);
+            
+            // 更新任务清单
+            updateTaskChecklist();
+        }
+
+        // 选中元素
+        function selectElement(element) {
+            document.querySelectorAll('.canvas-element').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedElement = element;
+
+            // 显示属性面板
+            propertiesPanel.style.display = 'block';
+            document.getElementById('elementName').value = element.querySelector('.element-label').textContent;
+            document.getElementById('elementType').value = element.dataset.type;
+        }
+
+        // 点击画布取消选中
+        drawingArea.addEventListener('click', (e) => {
+            if (e.target === drawingArea) {
+                document.querySelectorAll('.canvas-element').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                selectedElement = null;
+                propertiesPanel.style.display = 'none';
+            }
+        });
+
+        // 属性面板事件
+        document.getElementById('elementName').addEventListener('input', function() {
+            if (selectedElement) {
+                selectedElement.querySelector('.element-label').textContent = this.value;
+            }
+        });
+
+        // 工具按钮
+        document.getElementById('selectTool').addEventListener('click', function() {
+            isConnectMode = false;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            drawingArea.style.cursor = 'default';
+        });
+
+        document.getElementById('connectTool').addEventListener('click', function() {
+            isConnectMode = !isConnectMode;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            if (isConnectMode) {
+                this.classList.add('active');
+                drawingArea.style.cursor = 'crosshair';
+                alert('点击第一个组件，再点击第二个组件来创建连接');
+            } else {
+                document.getElementById('selectTool').classList.add('active');
+                drawingArea.style.cursor = 'default';
+            }
+        });
+
+        document.getElementById('deleteTool').addEventListener('click', function() {
+            if (selectedElement) {
+                selectedElement.remove();
+                selectedElement = null;
+                propertiesPanel.style.display = 'none';
+                
+                // 如果没有元素了，显示占位符
+                if (drawingArea.querySelectorAll('.canvas-element').length === 0) {
+                    const placeholder = drawingArea.querySelector('.canvas-placeholder');
+                    if (placeholder) placeholder.style.display = 'block';
+                }
+            }
+        });
+
+        document.getElementById('clearCanvas').addEventListener('click', function() {
+            if (confirm('确定要清空画布吗？')) {
+                document.querySelectorAll('.canvas-element').forEach(el => el.remove());
+                selectedElement = null;
+                propertiesPanel.style.display = 'none';
+                const placeholder = drawingArea.querySelector('.canvas-placeholder');
+                if (placeholder) placeholder.style.display = 'block';
+            }
+        });
+
+        document.getElementById('saveCanvas').addEventListener('click', function() {
+            alert('提示：请使用截图工具保存你的架构图（如系统截图或浏览器插件）');
+        });
+
+        // 更新任务清单
+        function updateTaskChecklist() {
+            const elements = document.querySelectorAll('.canvas-element');
+            if (elements.length >= 3) {
+                document.querySelector('[data-check="1"]').classList.add('completed');
+            }
+            if (elements.length >= 5) {
+                document.querySelector('[data-check="2"]').classList.add('completed');
+            }
+        }
+
+        // 提交作业
+        function submitWork() {
+            const elementCount = document.querySelectorAll('.canvas-element').length;
+            if (elementCount < 3) {
+                alert('请至少添加3个组件后再提交');
+                return;
+            }
+            alert('作业提交成功！🎉 导师将在24小时内给予反馈。');
+            markComplete();
+        }
+
+        // 标记完成
+        function markComplete() {
+            const btn = document.querySelector('.btn-complete');
+            btn.innerHTML = '<span>✓</span><span>已完成</span>';
+            btn.style.background = '#389E0D';
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+            
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = '100%';
+            
+            // 更新任务清单
+            document.querySelectorAll('#taskChecklist li').forEach(li => {
+                li.classList.add('completed');
+            });
+        }
+
+        // 初始化
+        updateProgress();
+        document.getElementById('selectTool').classList.add('active');
+        
+        // ========== 架构模板库 ==========
+        const templates = {
+            'three-tier': [
+                { type: 'client', icon: '📱', label: '客户端', x: 100, y: 50 },
+                { type: 'client', icon: '🌐', label: 'Web端', x: 250, y: 50 },
+                { type: 'gateway', icon: '🔀', label: 'API网关', x: 175, y: 150 },
+                { type: 'server', icon: '⚙️', label: '业务服务', x: 175, y: 250 },
+                { type: 'database', icon: '🗄️', label: '数据库', x: 175, y: 350 }
+            ],
+            'microservice': [
+                { type: 'client', icon: '📱', label: 'App端', x: 50, y: 50 },
+                { type: 'client', icon: '🌐', label: 'Web端', x: 150, y: 50 },
+                { type: 'gateway', icon: '🔀', label: 'API网关', x: 250, y: 50 },
+                { type: 'server', icon: '👤', label: '用户服务', x: 50, y: 180 },
+                { type: 'server', icon: '📦', label: '商品服务', x: 150, y: 180 },
+                { type: 'server', icon: '🛒', label: '订单服务', x: 250, y: 180 },
+                { type: 'cache', icon: '⚡', label: 'Redis缓存', x: 100, y: 310 },
+                { type: 'database', icon: '🗄️', label: '数据库集群', x: 200, y: 310 }
+            ],
+            'ecommerce': [
+                { type: 'client', icon: '📱', label: 'iOS App', x: 50, y: 30 },
+                { type: 'client', icon: '🤖', label: 'Android', x: 150, y: 30 },
+                { type: 'client', icon: '🌐', label: 'Web端', x: 250, y: 30 },
+                { type: 'gateway', icon: '🔀', label: '网关', x: 300, y: 120 },
+                { type: 'server', icon: '👤', label: '用户服务', x: 50, y: 200 },
+                { type: 'server', icon: '📦', label: '商品服务', x: 150, y: 200 },
+                { type: 'server', icon: '🛒', label: '订单服务', x: 250, y: 200 },
+                { type: 'server', icon: '💳', label: '支付服务', x: 350, y: 200 },
+                { type: 'cache', icon: '⚡', label: '缓存', x: 80, y: 320 },
+                { type: 'database', icon: '🗄️', label: 'MySQL', x: 200, y: 320 },
+                { type: 'database', icon: '🔍', label: 'ES搜索', x: 320, y: 320 }
+            ],
+            'blank': []
+        };
+        
+        // 模板选择事件
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 高亮选中的模板
+                document.querySelectorAll('.template-card').forEach(c => {
+                    c.style.borderColor = 'var(--border-light)';
+                    c.style.transform = 'scale(1)';
+                });
+                this.style.borderColor = 'var(--accent)';
+                this.style.transform = 'scale(1.02)';
+                
+                const templateName = this.dataset.template;
+                loadTemplate(templateName);
+                
+                // 滚动到绘图区域
+                document.querySelector('.canvas-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            
+            // 悬停效果
+            card.addEventListener('mouseenter', function() {
+                if (this.style.borderColor !== 'var(--accent)') {
+                    this.style.borderColor = 'var(--text-muted)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (this.style.borderColor !== 'var(--accent)') {
+                    this.style.borderColor = 'var(--border-light)';
+                }
+            });
+        });
+        
+        // 加载模板
+        function loadTemplate(templateName) {
+            const elements = templates[templateName];
+            
+            // 清空画布
+            document.querySelectorAll('.canvas-element').forEach(el => el.remove());
+            selectedElement = null;
+            propertiesPanel.style.display = 'none';
+            
+            // 隐藏占位符
+            const placeholder = drawingArea.querySelector('.canvas-placeholder');
+            if (placeholder) placeholder.style.display = elements.length > 0 ? 'none' : 'block';
+            
+            // 创建元素
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    createCanvasElement(el.x, el.y, el.type, el.icon, el.label);
+                }, index * 100);
+            });
+            
+            // 更新任务清单
+            if (elements.length >= 3) {
+                setTimeout(() => {
+                    updateTaskChecklist();
+                }, elements.length * 100 + 200);
+            }
+        }
+    </script>
+</body>
+</html>
