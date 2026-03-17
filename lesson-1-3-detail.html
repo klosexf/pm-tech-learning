@@ -1162,6 +1162,15 @@
                         <span class="api-desc-text">创建订单</span>
                     </div>
                 </div>
+                <div class="scenario-detail" style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 10px;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">📋 核心接口详解</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                        <p style="margin-bottom: 8px;"><strong style="color: var(--info);">GET /products/{id}</strong> — 路径参数：id（商品ID）；响应：商品名称、价格、库存、图片、规格等</p>
+                        <p style="margin-bottom: 8px;"><strong style="color: var(--success);">POST /cart/items</strong> — 请求体：productId、quantity、skuId（可选）；响应：购物车项ID、商品信息</p>
+                        <p style="margin-bottom: 8px;"><strong style="color: var(--warning);">PUT /cart/items/{id}</strong> — 路径参数：id（购物车项ID）；请求体：quantity（新数量）；响应：更新后的购物车项信息</p>
+                        <p><strong style="color: #FF4D4F;">DELETE /cart/items/{id}</strong> — 路径参数：id（购物车项ID）；响应：删除结果</p>
+                    </div>
+                </div>
             </div>
 
             <div class="scenario-card">
@@ -1190,6 +1199,15 @@
                         <span class="api-method-tag" style="background: var(--warning);">PUT</span>
                         <span class="api-path-text">/users/me</span>
                         <span class="api-desc-text">更新用户信息</span>
+                    </div>
+                </div>
+                <div class="scenario-detail" style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 10px;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">📋 核心接口详解</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                        <p style="margin-bottom: 8px;"><strong style="color: var(--success);">POST /auth/register</strong> — 请求体：phone/email、password、nickname（可选）；响应：用户ID、Token</p>
+                        <p style="margin-bottom: 8px;"><strong style="color: var(--success);">POST /auth/login</strong> — 请求体：account、password；响应：用户信息、Token（用于后续请求身份验证）</p>
+                        <p style="margin-bottom: 8px;"><strong style="color: var(--info);">GET /users/me</strong> — 请求头：Authorization（Bearer Token）；响应：用户昵称、头像、手机号（脱敏）、注册时间等</p>
+                        <p><strong style="color: var(--warning);">PUT /users/me</strong> — 请求头：Authorization；请求体：nickname、avatar（可选）；响应：更新后的用户信息</p>
                     </div>
                 </div>
             </div>

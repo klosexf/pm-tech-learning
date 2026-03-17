@@ -434,33 +434,35 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 24px;
+            gap: 16px;
             flex-wrap: wrap;
         }
 
         .data-flow-layer {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 12px;
         }
 
         .data-flow-box {
-            width: 140px;
-            padding: 20px;
+            width: 110px;
+            padding: 16px 12px;
             background: var(--bg-secondary);
             border-radius: 12px;
             box-shadow: var(--shadow-soft);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .data-flow-box .icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 28px;
+            margin-bottom: 6px;
         }
 
         .data-flow-box .label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -469,20 +471,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 2px;
         }
 
         .data-flow-arrow {
-            font-size: 24px;
+            font-size: 20px;
             color: var(--accent);
+            line-height: 1;
         }
 
         .data-flow-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             background: var(--bg-secondary);
-            padding: 4px 10px;
-            border-radius: 10px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
         }
 
         /* 接口文档卡片 */
@@ -562,6 +567,83 @@
 
         .param-optional {
             color: var(--text-muted);
+        }
+
+        .param-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .param-type-path {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .param-type-query {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .param-type-body {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .param-type-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .param-type-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .param-type-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .api-url-example {
+            font-family: 'SF Mono', monospace;
+            font-size: 12px;
+            background: var(--bg-primary);
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-light);
+            word-break: break-all;
+        }
+
+        .api-url-example .path-param {
+            color: #1565C0;
+            font-weight: 600;
+        }
+
+        .api-url-example .query-param {
+            color: #E65100;
+            font-weight: 600;
+        }
+
+        .api-url-example .body-indicator {
+            color: #2E7D32;
+            font-weight: 600;
         }
 
         /* 要点卡片 */
@@ -1204,7 +1286,41 @@
                 </div>
 
                 <div class="api-section">
-                    <div class="api-section-title">请求参数</div>
+                    <div class="api-section-title">请求 URL 示例</div>
+                    <div class="api-url-example">
+                        POST /api/v1/orders/create
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 11px;">
+                            ℹ️ 此接口无路径参数和查询参数，所有参数通过请求体(body)传递
+                        </span>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-section-title">参数类型说明</div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="param-type-badge param-type-path">路径参数</span>
+                            <span style="font-size: 12px; color: var(--text-muted);">URL路径中的动态参数</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="param-type-badge param-type-query">查询参数</span>
+                            <span style="font-size: 12px; color: var(--text-muted);">URL中"?"后的键值对</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="param-type-badge param-type-body">请求体参数</span>
+                            <span style="font-size: 12px; color: var(--text-muted);">HTTP请求正文中的数据</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="param-type-section" style="border-left-color: #1565C0;">
+                    <div class="param-type-section-title">
+                        <span class="param-type-badge param-type-path">路径参数</span>
+                        Path Parameters
+                    </div>
+                    <div class="param-type-desc">
+                        📍 本接口无路径参数。路径参数示例：<code style="background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">/api/users/<strong style="color: #1565C0;">{userId}</strong></code> 中的 userId 即为路径参数
+                    </div>
                     <table class="api-table">
                         <thead>
                             <tr>
@@ -1216,28 +1332,103 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>productId</td>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic;">
+                                    本接口无路径参数
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="param-type-section" style="border-left-color: #E65100;">
+                    <div class="param-type-section-title">
+                        <span class="param-type-badge param-type-query">查询参数</span>
+                        Query Parameters
+                    </div>
+                    <div class="param-type-desc">
+                        🔍 本接口无查询参数。查询参数示例：<code style="background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">/api/products?<strong style="color: #E65100;">keyword=耳机&page=1</strong></code> 中 keyword 和 page 即为查询参数
+                    </div>
+                    <table class="api-table">
+                        <thead>
+                            <tr>
+                                <th>参数名</th>
+                                <th>类型</th>
+                                <th>必填</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic;">
+                                    本接口无查询参数
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="param-type-section" style="border-left-color: #2E7D32;">
+                    <div class="param-type-section-title">
+                        <span class="param-type-badge param-type-body">请求体参数</span>
+                        Request Body Parameters
+                    </div>
+                    <div class="param-type-desc">
+                        📦 以下参数通过 HTTP 请求正文传递，格式为 JSON
+                    </div>
+                    <div class="api-url-example" style="margin-bottom: 12px; background: #E8F5E9;">
+                        <strong style="color: #2E7D32;">请求体示例：</strong><br>
+                        {<br>
+                        &nbsp;&nbsp;"productId": "PROD001",<br>
+                        &nbsp;&nbsp;"quantity": 2,<br>
+                        &nbsp;&nbsp;"addressId": "ADDR123",<br>
+                        &nbsp;&nbsp;"remark": "请尽快发货"<br>
+                        }
+                    </div>
+                    <table class="api-table">
+                        <thead>
+                            <tr>
+                                <th>参数名</th>
+                                <th>类型</th>
+                                <th>必填</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="param-type-badge param-type-body">body</span>
+                                    productId
+                                </td>
                                 <td>string</td>
                                 <td class="param-required">是</td>
-                                <td>商品ID</td>
+                                <td>商品ID，唯一标识要购买的商品</td>
                             </tr>
                             <tr>
-                                <td>quantity</td>
+                                <td>
+                                    <span class="param-type-badge param-type-body">body</span>
+                                    quantity
+                                </td>
                                 <td>number</td>
                                 <td class="param-required">是</td>
-                                <td>购买数量</td>
+                                <td>购买数量，必须大于0</td>
                             </tr>
                             <tr>
-                                <td>addressId</td>
+                                <td>
+                                    <span class="param-type-badge param-type-body">body</span>
+                                    addressId
+                                </td>
                                 <td>string</td>
                                 <td class="param-required">是</td>
-                                <td>收货地址ID</td>
+                                <td>收货地址ID，用户已保存的地址</td>
                             </tr>
                             <tr>
-                                <td>remark</td>
+                                <td>
+                                    <span class="param-type-badge param-type-body">body</span>
+                                    remark
+                                </td>
                                 <td>string</td>
                                 <td class="param-optional">否</td>
-                                <td>订单备注</td>
+                                <td>订单备注，最多200字符</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1412,6 +1603,7 @@
                     <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">
                         <strong>功能：</strong>发送短信验证码到用户手机<br>
                         <strong>参数：</strong>phone（手机号）<br>
+                        <strong>响应：</strong>返回发送结果，包含验证码有效期（通常5分钟）<br>
                         <strong>安全限制：</strong>同一手机号每分钟只能发送一次，每天最多5次
                     </p>
                 </div>
@@ -1552,6 +1744,7 @@ skuId|string|否|商品规格ID</textarea>
                                     </tr>
                                 </tbody>
                             </table>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.6;">💡 <strong>说明：</strong>前端调用此接口时，需要将以上参数放入请求体（body）中以 JSON 格式传递。必填参数缺失会导致请求失败，可选参数可根据业务需要选择性传递。</p>
                         </div>
                         
                         <div>
@@ -1565,6 +1758,7 @@ skuId|string|否|商品规格ID</textarea>
     "quantity": 1
   }
 }</pre>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.6;">💡 <strong>说明：</strong>响应采用标准三段式结构：<code>code</code> 表示业务状态码（200=成功）；<code>message</code> 提供可读的提示信息；<code>data</code> 包含具体业务数据，前端可根据 cartItemId 进行后续操作（如修改数量、删除等）。</p>
                         </div>
                     </div>
                 </div>
