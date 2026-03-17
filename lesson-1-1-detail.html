@@ -1268,33 +1268,33 @@ Content-Type: application/json
                 name: '点赞操作',
                 steps: [
                     { node: 'user', action: '用户点击点赞按钮', detail: '触发点赞交互事件' },
-                    { node: 'client', action: '前端发送请求', detail: 'POST /api/articles/123/like' },
-                    { node: 'server', action: '服务器处理', detail: '验证用户身份、检查是否已点赞' },
+                    { node: 'frontend', action: '前端发送请求', detail: 'POST /api/articles/123/like' },
+                    { node: 'backend', action: '服务器处理', detail: '验证用户身份、检查是否已点赞' },
                     { node: 'database', action: '数据库更新', detail: '更新点赞数 +1，记录用户点赞' },
-                    { node: 'server', action: '返回结果', detail: '200 OK - 点赞成功' },
-                    { node: 'client', action: '前端更新界面', detail: '点赞图标变红，数字+1' }
+                    { node: 'backend', action: '返回结果', detail: '200 OK - 点赞成功' },
+                    { node: 'frontend', action: '前端更新界面', detail: '点赞图标变红，数字+1' }
                 ]
             },
             order: {
                 name: '下单操作',
                 steps: [
                     { node: 'user', action: '用户点击"立即购买"', detail: '确认收货地址、支付方式' },
-                    { node: 'client', action: '前端发送请求', detail: 'POST /api/orders/create' },
-                    { node: 'server', action: '服务器处理', detail: '验证库存、计算价格、生成订单号' },
+                    { node: 'frontend', action: '前端发送请求', detail: 'POST /api/orders/create' },
+                    { node: 'backend', action: '服务器处理', detail: '验证库存、计算价格、生成订单号' },
                     { node: 'database', action: '数据库写入', detail: '创建订单记录、扣减库存' },
-                    { node: 'server', action: '返回结果', detail: '200 OK - 返回订单ID和支付信息' },
-                    { node: 'client', action: '前端跳转', detail: '跳转到支付页面' }
+                    { node: 'backend', action: '返回结果', detail: '200 OK - 返回订单ID和支付信息' },
+                    { node: 'frontend', action: '前端跳转', detail: '跳转到支付页面' }
                 ]
             },
             search: {
                 name: '搜索操作',
                 steps: [
                     { node: 'user', action: '用户输入关键词', detail: '输入"无线耳机"' },
-                    { node: 'client', action: '前端防抖后发送', detail: 'GET /api/products?keyword=无线耳机' },
-                    { node: 'server', action: '服务器搜索', detail: '查询匹配的商品数据' },
+                    { node: 'frontend', action: '前端防抖后发送', detail: 'GET /api/products?keyword=无线耳机' },
+                    { node: 'backend', action: '服务器搜索', detail: '查询匹配的商品数据' },
                     { node: 'database', action: '数据库查询', detail: '返回匹配结果列表' },
-                    { node: 'server', action: '返回结果', detail: '200 OK - 返回商品列表（20条）' },
-                    { node: 'client', action: '前端渲染', detail: '展示搜索结果列表' }
+                    { node: 'backend', action: '返回结果', detail: '200 OK - 返回商品列表（20条）' },
+                    { node: 'frontend', action: '前端渲染', detail: '展示搜索结果列表' }
                 ]
             }
         };
@@ -1308,8 +1308,17 @@ Content-Type: application/json
             btn.addEventListener('click', function() {
                 if (isAnimating) return;
                 currentScenario = this.dataset.scenario;
-                document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+                
+                document.querySelectorAll('.scenario-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'transparent';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                
                 this.classList.add('active');
+                this.style.borderColor = 'var(--accent)';
+                this.style.color = 'var(--accent)';
+                
                 updateInfoPanel(`已选择「${scenarios[currentScenario].name}」场景，点击"发送请求"开始模拟`);
             });
         });
@@ -1401,14 +1410,24 @@ Content-Type: application/json
             });
             
             updateInfoPanel('点击下方按钮开始模拟请求流程');
+            
+            // 重置按钮状态
+            initializeButtons();
         }
         
         // 绑定事件
         document.getElementById('startSimulation').addEventListener('click', playAnimation);
         document.getElementById('resetSimulation').addEventListener('click', resetSimulation);
         
-        // 默认选中第一个场景
-        document.querySelector('.scenario-btn[data-scenario="like"]').classList.add('active');
+        // 初始化按钮状态
+        function initializeButtons() {
+            const activeBtn = document.querySelector('.scenario-btn.active');
+            if (activeBtn) {
+                activeBtn.style.borderColor = 'var(--accent)';
+                activeBtn.style.color = 'var(--accent)';
+            }
+        }
+        initializeButtons();
     </script>
 </body>
 </html>
