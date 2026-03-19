@@ -330,9 +330,9 @@
         /* 表详情侧边栏 */
         .table-detail-panel {
             position: fixed;
-            right: -400px;
+            right: -500px;
             top: 0;
-            width: 400px;
+            width: 500px;
             height: 100vh;
             background: var(--bg-secondary);
             box-shadow: -4px 0 20px rgba(0,0,0,0.1);
@@ -858,6 +858,7 @@ user_id, created_at, is_deleted</pre>
     <span class="code-comment">-- 软删除标记（不用真正删除数据）</span>
     <span class="code-string">`is_deleted`</span> <span class="code-keyword">TINYINT DEFAULT 0</span>,
     
+    <span class="code-comment">-- 主键：唯一标识每条记录，id字段值不能重复，也不能为空</span>
     <span class="code-keyword">PRIMARY KEY</span> (<span class="code-string">`id`</span>)
 ) <span class="code-keyword">ENGINE</span>=<span class="code-string">InnoDB</span>;</pre>
             </div>
@@ -903,9 +904,13 @@ user_id, created_at, is_deleted</pre>
     <span class="code-string">`pay_time`</span> <span class="code-keyword">DATETIME DEFAULT NULL COMMENT</span> <span class="code-string">'支付时间'</span>,
     <span class="code-string">`created_at`</span> <span class="code-keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
     <span class="code-string">`updated_at`</span> <span class="code-keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</span>,
+    <span class="code-comment">-- 主键：唯一标识每条记录，id字段值不能重复，也不能为空</span>
     <span class="code-keyword">PRIMARY KEY</span> (<span class="code-string">`id`</span>),
+    <span class="code-comment">-- 唯一索引：确保订单编号不重复，一个订单号只能对应一个订单</span>
     <span class="code-keyword">UNIQUE KEY</span> <span class="code-string">`uk_order_no`</span> (<span class="code-string">`order_no`</span>),
+    <span class="code-comment">-- 普通索引：加速按用户ID查询订单（如：查询某用户的所有订单）</span>
     <span class="code-keyword">KEY</span> <span class="code-string">`idx_user_id`</span> (<span class="code-string">`user_id`</span>),
+    <span class="code-comment">-- 联合索引：加速按状态和时间范围查询（如：查询待付款且最近创建的订单）</span>
     <span class="code-keyword">KEY</span> <span class="code-string">`idx_status_created`</span> (<span class="code-string">`status`</span>, <span class="code-string">`created_at`</span>)
 ) <span class="code-keyword">ENGINE</span>=<span class="code-string">InnoDB COMMENT</span>=<span class="code-string">'订单表'</span>;</pre>
             </div>
@@ -918,12 +923,18 @@ user_id, created_at, is_deleted</pre>
             <div class="highlight-box">
                 <h4>✅ 表设计检查清单</h4>
                 <ul>
-                    <li>每个表都有自增主键 ID 吗？</li>
-                    <li>是否包含了 created_at 和 updated_at 字段？</li>
-                    <li>是否需要软删除（is_deleted）？</li>
-                    <li>外键关联是否正确建立了索引？</li>
-                    <li>金额字段是否使用 DECIMAL 而非 FLOAT？</li>
-                    <li>表和字段是否有清晰的注释说明？</li>
+                    <li><strong>每个表都有自增主键 ID 吗？</strong><br>
+                    <span style="color: var(--text-muted); font-size: 13px;">主键是唯一标识每条记录的字段，通常使用自增的 BIGINT 类型，如 id = 1, 2, 3... 方便快速定位和关联查询。</span></li>
+                    <li><strong>是否包含了 created_at 和 updated_at 字段？</strong><br>
+                    <span style="color: var(--text-muted); font-size: 13px;">记录数据的创建时间和最后更新时间，便于追踪数据变更、排查问题、统计报表（如按时间段查询订单）。</span></li>
+                    <li><strong>是否需要软删除（is_deleted）？</strong><br>
+                    <span style="color: var(--text-muted); font-size: 13px;">用标记位代替物理删除，0 表示未删除，1 表示已删除。误删后可恢复，保留历史数据用于审计和数据分析。</span></li>
+                    <li><strong>外键关联是否正确建立了索引？</strong><br>
+                    <span style="color: var(--text-muted); font-size: 13px;">外键字段（如 user_id）经常用于关联查询，加索引可大幅提升查询速度，避免全表扫描导致性能问题。</span></li>
+                    <li><strong>金额字段是否使用 DECIMAL 而非 FLOAT？</strong><br>
+                    <span style="color: var(--text-muted); font-size: 13px;">DECIMAL(10,2) 存储精确小数，适合金额计算；FLOAT 有精度误差，可能导致 99.99 变成 99.989999，财务计算会出错。</span></li>
+                    <li><strong>表和字段是否有清晰的注释说明？</strong><br>
+                    <span style="color: var(--text-muted); font-size: 13px;">COMMENT 注释帮助团队成员理解字段含义，如 status 字段注释 '1-待付款 2-待发货 3-待收货 4-已完成'，避免歧义。</span></li>
                 </ul>
             </div>
 

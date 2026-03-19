@@ -837,6 +837,17 @@
                 </div>
             </div>
 
+            <div class="highlight-box">
+                <h4>📌 SQL 关键字解析</h4>
+                <ul>
+                    <li><strong>SELECT</strong>：选择要查询的字段，* 表示全部字段</li>
+                    <li><strong>AS</strong>：为查询结果中的列或表设置别名，增强可读性</li>
+                    <li><strong>FROM</strong>：指定查询的数据表</li>
+                    <li><strong>WHERE</strong>：筛选条件，支持 AND、OR 组合多个条件</li>
+                    <li><strong>GROUP BY</strong>：按指定字段对数据进行分组，常与聚合函数配合使用</li>
+                </ul>
+            </div>
+
             <div class="key-points">
                 <div class="key-point-card">
                     <div class="key-point-icon">🔢</div>
@@ -926,18 +937,67 @@
                 
                 <!-- 说明面板 -->
                 <div id="relationInfo" style="margin-top: 20px; padding: 20px; background: var(--bg-secondary); border-radius: 12px; border-left: 4px solid var(--accent);">
-                    <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">📌 点击表节点查看详细信息</div>
-                    <div style="font-size: 14px; color: var(--text-secondary);">观察表之间的连线，实线表示外键关联，数字表示关系类型（1:1、1:N、M:N）。</div>
+                    <div style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">📌 点击表节点查看详细信息</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
+                        观察表之间的连线，虚线表示外键关联，中间标签显示关系类型（1:1、1:N、M:N）。
+                    </div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(24, 144, 255, 0.1); border-radius: 6px; font-size: 12px; color: #1890FF;">
+                            <span style="width: 8px; height: 8px; background: #1890FF; border-radius: 50%;"></span>
+                            蓝色：订单表
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(232, 111, 81, 0.1); border-radius: 6px; font-size: 12px; color: #E86F51;">
+                            <span style="width: 8px; height: 8px; background: #E86F51; border-radius: 50%;"></span>
+                            橙色：用户表
+                        </span>
+                    </div>
                 </div>
             </div>
             
             <div class="highlight-box" style="margin-top: 24px;">
-                <h4>💡 关系类型说明</h4>
-                <ul>
-                    <li><strong>1:1（一对一）</strong>：如用户-用户详情，一个用户对应一条详情记录</li>
-                    <li><strong>1:N（一对多）</strong>：如用户-订单，一个用户可以有多个订单</li>
-                    <li><strong>M:N（多对多）</strong>：如订单-商品，通过中间表（订单项）关联</li>
-                </ul>
+                <h4>💡 关系类型详解</h4>
+                
+                <div style="margin-bottom: 20px;">
+                    <h5 style="color: var(--accent); margin-bottom: 10px;">🔹 一对多关系（1:N）</h5>
+                    <p style="margin-bottom: 10px;"><strong>定义：</strong>一个 A 可以对应多个 B，但一个 B 只能属于一个 A。</p>
+                    <p style="margin-bottom: 10px;"><strong>典型案例：</strong>用户与订单的关系</p>
+                    <ul style="margin-left: 20px; margin-bottom: 10px;">
+                        <li>一个用户可以下<strong>多个</strong>订单</li>
+                        <li>一个订单只能属于<strong>一个</strong>用户</li>
+                    </ul>
+                    <p style="margin-bottom: 8px;"><strong>实现方式：</strong>在 orders 表中添加 user_id 字段作为外键，指向 users 表的 id。</p>
+                    <div style="background: var(--bg-code); padding: 12px; border-radius: 8px; font-size: 13px; font-family: monospace;">
+用户A ──┬── 订单001<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── 订单002<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── 订单003
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h5 style="color: var(--accent); margin-bottom: 10px;">🔹 多对多关系（M:N）</h5>
+                    <p style="margin-bottom: 10px;"><strong>定义：</strong>一个 A 可以对应多个 B，同时一个 B 也可以对应多个 A。</p>
+                    <p style="margin-bottom: 10px;"><strong>典型案例：</strong>订单与商品的关系</p>
+                    <ul style="margin-left: 20px; margin-bottom: 10px;">
+                        <li>一个订单可以包含<strong>多个</strong>商品</li>
+                        <li>一个商品可以出现在<strong>多个</strong>订单中</li>
+                    </ul>
+                    <p style="margin-bottom: 8px;"><strong>实现方式：</strong>需要引入中间表（order_items），包含 order_id 和 product_id 两个外键。</p>
+                    <div style="background: var(--bg-code); padding: 12px; border-radius: 8px; font-size: 13px; font-family: monospace;">
+订单001 ──┬── iPhone<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── 耳机<br>
+订单002 ──┼── iPhone &nbsp;&nbsp;← 同一商品出现在多个订单<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── 手机壳
+                    </div>
+                </div>
+                
+                <div style="background: rgba(232, 111, 81, 0.1); padding: 15px; border-radius: 10px; border-left: 3px solid var(--accent);">
+                    <h5 style="margin-bottom: 8px;">📌 快速判断口诀</h5>
+                    <p style="margin: 0; font-size: 14px;"><strong>"一个能否有多个？"</strong></p>
+                    <ul style="margin: 8px 0 0 20px; font-size: 13px;">
+                        <li>如果只有一方能有多个 → <strong>一对多</strong></li>
+                        <li>如果双方都能有多个 → <strong>多对多</strong></li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -1064,11 +1124,11 @@
             },
             'order-product': {
                 tables: [
-                    { id: 'orders', name: 'orders', label: '订单表', x: 50, y: 50, color: '#1890FF',
+                    { id: 'orders', name: 'orders', label: '订单表', x: 60, y: 40, color: '#1890FF',
                       fields: ['id (PK)', 'user_id', 'total_amount', 'status'] },
-                    { id: 'order_items', name: 'order_items', label: '订单项表', x: 180, y: 180, color: '#52C41A',
+                    { id: 'order_items', name: 'order_items', label: '订单项表', x: 220, y: 220, color: '#52C41A',
                       fields: ['id (PK)', 'order_id (FK)', 'product_id (FK)', 'quantity', 'price'] },
-                    { id: 'products', name: 'products', label: '商品表', x: 320, y: 50, color: '#FAAD14',
+                    { id: 'products', name: 'products', label: '商品表', x: 380, y: 40, color: '#FAAD14',
                       fields: ['id (PK)', 'name', 'price', 'stock', 'category_id'] },
                 ],
                 relations: [
@@ -1078,18 +1138,18 @@
             },
             'full-system': {
                 tables: [
-                    { id: 'users', name: 'users', label: '用户表', x: 50, y: 40, color: '#E86F51',
+                    { id: 'users', name: 'users', label: '用户表', x: 40, y: 30, color: '#E86F51',
                       fields: ['id (PK)', 'username', 'email', 'phone'] },
-                    { id: 'orders', name: 'orders', label: '订单表', x: 200, y: 40, color: '#1890FF',
+                    { id: 'orders', name: 'orders', label: '订单表', x: 220, y: 30, color: '#1890FF',
                       fields: ['id (PK)', 'user_id (FK)', 'total_amount', 'status'] },
-                    { id: 'order_items', name: 'order_items', label: '订单项', x: 200, y: 180, color: '#52C41A',
-                      fields: ['id (PK)', 'order_id (FK)', 'product_id (FK)'] },
-                    { id: 'products', name: 'products', label: '商品表', x: 360, y: 40, color: '#FAAD14',
+                    { id: 'products', name: 'products', label: '商品表', x: 400, y: 30, color: '#FAAD14',
                       fields: ['id (PK)', 'name', 'price', 'stock'] },
-                    { id: 'addresses', name: 'addresses', label: '地址表', x: 360, y: 180, color: '#722ED1',
-                      fields: ['id (PK)', 'user_id (FK)', 'address', 'is_default'] },
-                    { id: 'categories', name: 'categories', label: '分类表', x: 50, y: 180, color: '#13C2C2',
+                    { id: 'categories', name: 'categories', label: '分类表', x: 40, y: 220, color: '#13C2C2',
                       fields: ['id (PK)', 'name', 'parent_id'] },
+                    { id: 'order_items', name: 'order_items', label: '订单项', x: 220, y: 220, color: '#52C41A',
+                      fields: ['id (PK)', 'order_id (FK)', 'product_id (FK)'] },
+                    { id: 'addresses', name: 'addresses', label: '地址表', x: 400, y: 220, color: '#722ED1',
+                      fields: ['id (PK)', 'user_id (FK)', 'address', 'is_default'] },
                 ],
                 relations: [
                     { from: 'users', to: 'orders', type: '1:N', label: '' },
@@ -1116,10 +1176,10 @@
                 const fromTable = scene.tables.find(t => t.id === rel.from);
                 const toTable = scene.tables.find(t => t.id === rel.to);
                 if (fromTable && toTable) {
-                    const x1 = fromTable.x + 70;
-                    const y1 = fromTable.y + 60;
-                    const x2 = toTable.x + 70;
-                    const y2 = toTable.y + 60;
+                    const x1 = fromTable.x + 60;
+                    const y1 = fromTable.y + 50;
+                    const x2 = toTable.x + 60;
+                    const y2 = toTable.y + 50;
                     
                     // 线条
                     html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#E0DDD8" stroke-width="2" stroke-dasharray="5,5"/>`;
@@ -1137,12 +1197,12 @@
             // 绘制表节点
             scene.tables.forEach(table => {
                 html += `
-                    <div class="db-table-card" data-table="${table.id}" style="position: absolute; left: ${table.x}px; top: ${table.y}px; width: 140px; background: var(--bg-secondary); border-radius: 12px; box-shadow: var(--shadow-hover); border: 2px solid ${table.color}; cursor: pointer; transition: all 0.3s;">
-                        <div style="background: ${table.color}; color: white; padding: 10px 12px; border-radius: 10px 10px 0 0; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                    <div class="db-table-card" data-table="${table.id}" style="position: absolute; left: ${table.x}px; top: ${table.y}px; width: 120px; background: var(--bg-secondary); border-radius: 10px; box-shadow: var(--shadow-hover); border: 2px solid ${table.color}; cursor: pointer; transition: all 0.3s;">
+                        <div style="background: ${table.color}; color: white; padding: 8px 10px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                             <span>🗄️</span> ${table.name}
                         </div>
-                        <div style="padding: 8px 12px; font-size: 11px; color: var(--text-secondary);">
-                            ${table.fields.slice(0, 3).map(f => `<div style="padding: 3px 0; font-family: monospace;">${f}</div>`).join('')}
+                        <div style="padding: 6px 10px; font-size: 10px; color: var(--text-secondary);">
+                            ${table.fields.slice(0, 3).map(f => `<div style="padding: 2px 0; font-family: monospace;">${f}</div>`).join('')}
                             ${table.fields.length > 3 ? `<div style="color: var(--text-muted);">+${table.fields.length - 3} 字段</div>` : ''}
                         </div>
                     </div>

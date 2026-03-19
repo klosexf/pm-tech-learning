@@ -1115,58 +1115,43 @@
 
             <h3>订单表（t_order）设计</h3>
             <div class="code-block">
-<span class="keyword">CREATE TABLE</span> t_order (
-    id <span class="keyword">BIGINT PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">'订单ID'</span>,
-    order_no <span class="keyword">VARCHAR</span>(32) <span class="keyword">NOT NULL UNIQUE</span> COMMENT <span class="string">'订单编号'</span>,
-    user_id <span class="keyword">BIGINT NOT NULL</span> COMMENT <span class="string">'用户ID'</span>,
-    
-    <span class="comment">-- 金额信息</span>
-    total_amount <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'订单总金额'</span>,
-    discount_amount <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">DEFAULT</span> 0 COMMENT <span class="string">'优惠金额'</span>,
-    pay_amount <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'实付金额'</span>,
-    freight_amount <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">DEFAULT</span> 0 COMMENT <span class="string">'运费'</span>,
-    
-    <span class="comment">-- 状态信息</span>
-    status <span class="keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT <span class="string">'订单状态：0待付款 1已付款 2已发货 3已完成 4已取消'</span>,
-    pay_type <span class="keyword">TINYINT</span> COMMENT <span class="string">'支付方式：1微信 2支付宝 3银行卡'</span>,
-    pay_time <span class="keyword">DATETIME</span> COMMENT <span class="string">'支付时间'</span>,
-    
-    <span class="comment">-- 收货信息</span>
-    receiver_name <span class="keyword">VARCHAR</span>(50) COMMENT <span class="string">'收货人姓名'</span>,
-    receiver_mobile <span class="keyword">CHAR</span>(11) COMMENT <span class="string">'收货人电话'</span>,
-    receiver_address <span class="keyword">VARCHAR</span>(200) COMMENT <span class="string">'收货地址'</span>,
-    
-    <span class="comment">-- 时间戳</span>
-    created_at <span class="keyword">DATETIME NOT NULL DEFAULT</span> CURRENT_TIMESTAMP COMMENT <span class="string">'创建时间'</span>,
-    updated_at <span class="keyword">DATETIME NOT NULL DEFAULT</span> CURRENT_TIMESTAMP <span class="keyword">ON UPDATE</span> CURRENT_TIMESTAMP COMMENT <span class="string">'更新时间'</span>,
-    
-    <span class="keyword">INDEX</span> idx_user_id (user_id),
-    <span class="keyword">INDEX</span> idx_status (status),
-    <span class="keyword">INDEX</span> idx_created_at (created_at)
+<span class="keyword">CREATE TABLE</span> `t_order` (
+    `id` <span class="keyword">BIGINT PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">'订单ID'</span>,
+    `order_no` <span class="keyword">VARCHAR</span>(32) <span class="keyword">NOT NULL UNIQUE</span> COMMENT <span class="string">'订单编号'</span>,
+    `user_id` <span class="keyword">BIGINT NOT NULL</span> COMMENT <span class="string">'用户ID'</span>,
+    `total_amount` <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'订单总金额'</span>,
+    `discount_amount` <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">DEFAULT</span> 0 COMMENT <span class="string">'优惠金额'</span>,
+    `pay_amount` <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'实付金额'</span>,
+    `freight_amount` <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">DEFAULT</span> 0 COMMENT <span class="string">'运费'</span>,
+    `status` <span class="keyword">TINYINT NOT NULL DEFAULT</span> 0 COMMENT <span class="string">'订单状态：0待付款 1已付款 2已发货 3已完成 4已取消'</span>,
+    `pay_type` <span class="keyword">TINYINT</span> COMMENT <span class="string">'支付方式：1微信 2支付宝 3银行卡'</span>,
+    `pay_time` <span class="keyword">DATETIME</span> COMMENT <span class="string">'支付时间'</span>,
+    `receiver_name` <span class="keyword">VARCHAR</span>(50) COMMENT <span class="string">'收货人姓名'</span>,
+    `receiver_mobile` <span class="keyword">CHAR</span>(11) COMMENT <span class="string">'收货人电话'</span>,
+    `receiver_address` <span class="keyword">VARCHAR</span>(200) COMMENT <span class="string">'收货地址'</span>,
+    `created_at` <span class="keyword">DATETIME NOT NULL DEFAULT</span> CURRENT_TIMESTAMP COMMENT <span class="string">'创建时间'</span>,
+    `updated_at` <span class="keyword">DATETIME NOT NULL DEFAULT</span> CURRENT_TIMESTAMP <span class="keyword">ON UPDATE</span> CURRENT_TIMESTAMP COMMENT <span class="string">'更新时间'</span>,
+    <span class="keyword">INDEX</span> `idx_user_id` (`user_id`),
+    <span class="keyword">INDEX</span> `idx_status` (`status`),
+    <span class="keyword">INDEX</span> `idx_created_at` (`created_at`)
 ) COMMENT <span class="string">'订单表'</span>;
             </div>
 
             <h3>订单商品表（t_order_item）设计</h3>
             <div class="code-block">
-<span class="keyword">CREATE TABLE</span> t_order_item (
-    id <span class="keyword">BIGINT PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">'ID'</span>,
-    order_id <span class="keyword">BIGINT NOT NULL</span> COMMENT <span class="string">'订单ID'</span>,
-    product_id <span class="keyword">BIGINT NOT NULL</span> COMMENT <span class="string">'商品ID'</span>,
-    
-    <span class="comment">-- 商品快照</span>
-    product_name <span class="keyword">VARCHAR</span>(128) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'商品名称（快照）'</span>,
-    product_image <span class="keyword">VARCHAR</span>(256) COMMENT <span class="string">'商品图片'</span>,
-    product_spec <span class="keyword">VARCHAR</span>(100) COMMENT <span class="string">'商品规格'</span>,
-    
-    <span class="comment">-- 价格信息</span>
-    unit_price <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'单价'</span>,
-    quantity <span class="keyword">INT NOT NULL</span> COMMENT <span class="string">'数量'</span>,
-    subtotal <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'小计金额'</span>,
-    
-    created_at <span class="keyword">DATETIME NOT NULL DEFAULT</span> CURRENT_TIMESTAMP,
-    
-    <span class="keyword">INDEX</span> idx_order_id (order_id),
-    <span class="keyword">INDEX</span> idx_product_id (product_id)
+<span class="keyword">CREATE TABLE</span> `t_order_item` (
+    `id` <span class="keyword">BIGINT PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">'ID'</span>,
+    `order_id` <span class="keyword">BIGINT NOT NULL</span> COMMENT <span class="string">'订单ID'</span>,
+    `product_id` <span class="keyword">BIGINT NOT NULL</span> COMMENT <span class="string">'商品ID'</span>,
+    `product_name` <span class="keyword">VARCHAR</span>(128) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'商品名称（快照）'</span>,
+    `product_image` <span class="keyword">VARCHAR</span>(256) COMMENT <span class="string">'商品图片'</span>,
+    `product_spec` <span class="keyword">VARCHAR</span>(100) COMMENT <span class="string">'商品规格'</span>,
+    `unit_price` <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'单价'</span>,
+    `quantity` <span class="keyword">INT NOT NULL</span> COMMENT <span class="string">'数量'</span>,
+    `subtotal` <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">NOT NULL</span> COMMENT <span class="string">'小计金额'</span>,
+    `created_at` <span class="keyword">DATETIME NOT NULL DEFAULT</span> CURRENT_TIMESTAMP COMMENT <span class="string">'创建时间'</span>,
+    <span class="keyword">INDEX</span> `idx_order_id` (`order_id`),
+    <span class="keyword">INDEX</span> `idx_product_id` (`product_id`)
 ) COMMENT <span class="string">'订单商品表'</span>;
             </div>
 
