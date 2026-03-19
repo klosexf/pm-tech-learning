@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1.3 API：数据的搬运工 - PM Tech Hub</title>
+    <title>1.4 API：数据的搬运工 - PM Tech Hub</title>
     <style>
         :root {
             --bg-primary: #F5F3EF;
@@ -394,8 +394,9 @@
 
         .code-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
+            gap: 12px;
             margin-bottom: 16px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border-light);
@@ -424,6 +425,10 @@
             font-size: 14px;
             color: var(--text-primary);
             font-weight: 600;
+            margin-left: 0;
+            flex-shrink: 1;
+            overflow-wrap: break-word;
+            word-break: break-all;
         }
 
         .code-example pre {
@@ -904,13 +909,13 @@
             <span>›</span>
             <a href="phase1-detail.html">阶段一</a>
             <span>›</span>
-            <span class="current">1.3 API：数据的搬运工</span>
+            <span class="current">1.4 API：数据的搬运工</span>
         </nav>
 
         <!-- 课程头部 -->
         <header class="lesson-header">
             <div class="lesson-meta-bar">
-                <span class="lesson-number-badge">1.3</span>
+                <span class="lesson-number-badge">1.4</span>
                 <span class="lesson-type">⏱ 25分钟 · 📝 实战演练</span>
             </div>
             <h1>API：数据的搬运工</h1>
@@ -1040,9 +1045,9 @@
                 </div>
                 <pre>// 第四步：返回响应
 {
-  "code": 200,
-  "message": "success",
-  "data": {
+  "code": 200,        // 状态码(number)：业务处理结果，200表示成功，其他值表示各类错误
+  "message": "success", // 消息(string)：对处理结果的描述，成功时为"success"，失败时为错误说明
+  "data": {           // 数据(object)：具体的业务数据，包含请求所需的实际内容，结构根据接口而定
     "productId": "12345",
     "name": "无线蓝牙耳机",
     "price": 299.00,
@@ -1162,13 +1167,138 @@
                         <span class="api-desc-text">创建订单</span>
                     </div>
                 </div>
-                <div class="scenario-detail" style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 10px;">
-                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">📋 核心接口详解</div>
-                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
-                        <p style="margin-bottom: 8px;"><strong style="color: var(--info);">GET /products/{id}</strong> — 路径参数：id（商品ID）；响应：商品名称、价格、库存、图片、规格等</p>
-                        <p style="margin-bottom: 8px;"><strong style="color: var(--success);">POST /cart/items</strong> — 请求体：productId、quantity、skuId（可选）；响应：购物车项ID、商品信息</p>
-                        <p style="margin-bottom: 8px;"><strong style="color: var(--warning);">PUT /cart/items/{id}</strong> — 路径参数：id（购物车项ID）；请求体：quantity（新数量）；响应：更新后的购物车项信息</p>
-                        <p><strong style="color: #FF4D4F;">DELETE /cart/items/{id}</strong> — 路径参数：id（购物车项ID）；响应：删除结果</p>
+                <div class="scenario-detail" style="margin-top: 16px; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span>📋</span> 核心接口详解
+                    </div>
+                    
+                    <!-- GET 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--info);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--info); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">GET</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/products/{id}</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">获取商品详情</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">路径参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px;">
+                                    <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">id</code> 
+                                    <span>string类型，必填</span> — 商品唯一标识ID
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">name</code> 商品名称</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">price</code> 价格</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">stock</code> 库存数量</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">images</code> 图片URL列表</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">specifications</code> 规格参数</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">description</code> 商品描述</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">category</code> 所属分类</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- POST 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--success);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--success); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">POST</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/cart/items</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">添加商品到购物车</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求体参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">productId</code> 
+                                        <span>string类型，必填</span> — 商品ID
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">quantity</code> 
+                                        <span>number类型，必填</span> — 购买数量（最小值1）
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">skuId</code> 
+                                        <span>string类型，可选</span> — 商品规格ID（区分颜色/尺寸）
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">cartItemId</code> 购物车项ID</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">product</code> 商品基本信息</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">totalCount</code> 购物车商品总数</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">totalAmount</code> 购物车总价格</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PUT 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--warning);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--warning); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">PUT</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/cart/items/{id}</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">修改购物车商品数量</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">路径参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px;">
+                                    <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">id</code> 
+                                    <span>string类型，必填</span> — 购物车项ID
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求体参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px;">
+                                    <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">quantity</code> 
+                                    <span>number类型，必填</span> — 新的购买数量（1 ~ 库存上限）
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">cartItemId</code> 购物车项ID</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">quantity</code> 最新数量</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">subtotal</code> 小计金额</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">totalCount</code> 购物车商品总数</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">totalAmount</code> 购物车总价格</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DELETE 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; border-left: 4px solid #FF4D4F;">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: #FF4D4F; color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">DELETE</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/cart/items/{id}</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">删除购物车商品</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">路径参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px;">
+                                    <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">id</code> 
+                                    <span>string类型，必填</span> — 购物车项ID
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">success</code> 删除结果（boolean）</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">totalCount</code> 删除后商品总数</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">totalAmount</code> 删除后总价格</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">message</code> 提示信息</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1201,13 +1331,155 @@
                         <span class="api-desc-text">更新用户信息</span>
                     </div>
                 </div>
-                <div class="scenario-detail" style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 10px;">
-                    <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">📋 核心接口详解</div>
-                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
-                        <p style="margin-bottom: 8px;"><strong style="color: var(--success);">POST /auth/register</strong> — 请求体：phone/email、password、nickname（可选）；响应：用户ID、Token</p>
-                        <p style="margin-bottom: 8px;"><strong style="color: var(--success);">POST /auth/login</strong> — 请求体：account、password；响应：用户信息、Token（用于后续请求身份验证）</p>
-                        <p style="margin-bottom: 8px;"><strong style="color: var(--info);">GET /users/me</strong> — 请求头：Authorization（Bearer Token）；响应：用户昵称、头像、手机号（脱敏）、注册时间等</p>
-                        <p><strong style="color: var(--warning);">PUT /users/me</strong> — 请求头：Authorization；请求体：nickname、avatar（可选）；响应：更新后的用户信息</p>
+                <div class="scenario-detail" style="margin-top: 16px; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span>📋</span> 核心接口详解
+                    </div>
+
+                    <!-- POST /auth/register 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--success);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--success); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">POST</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/auth/register</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">用户注册</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求体参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">phone</code>
+                                        <span>string类型，与email二选一</span> — 手机号码（11位）
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">email</code>
+                                        <span>string类型，与phone二选一</span> — 邮箱地址
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">password</code>
+                                        <span>string类型，必填</span> — 密码（6-20位，需包含字母和数字）
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">nickname</code>
+                                        <span>string类型，可选</span> — 用户昵称（2-20位字符）
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">userId</code> 用户唯一标识ID</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">token</code> 身份验证令牌</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">expiresIn</code> Token有效期（秒）</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">refreshToken</code> 刷新令牌</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- POST /auth/login 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--success);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--success); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">POST</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/auth/login</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">用户登录</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求体参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">account</code>
+                                        <span>string类型，必填</span> — 登录账号（手机号或邮箱）
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">password</code>
+                                        <span>string类型，必填</span> — 登录密码
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">userId</code> 用户唯一标识ID</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">nickname</code> 用户昵称</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">avatar</code> 用户头像URL</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">token</code> 身份验证令牌</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">expiresIn</code> Token有效期（秒）</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">refreshToken</code> 刷新令牌</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GET /users/me 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--info);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--info); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">GET</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/users/me</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">获取当前用户信息</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求头参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px;">
+                                    <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">Authorization</code>
+                                    <span>string类型，必填</span> — Bearer Token（格式：Bearer {token}）
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">userId</code> 用户唯一标识ID</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">nickname</code> 用户昵称</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">avatar</code> 用户头像URL</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">phone</code> 手机号（脱敏显示）</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">email</code> 邮箱地址（脱敏显示）</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">createdAt</code> 注册时间</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">lastLoginAt</code> 最后登录时间</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PUT /users/me 接口 -->
+                    <div class="api-detail-card" style="background: var(--bg-secondary); border-radius: 10px; padding: 16px; border-left: 4px solid var(--warning);">
+                        <div class="api-detail-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span class="api-method-badge" style="background: var(--warning); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">PUT</span>
+                            <code style="font-size: 13px; color: var(--text-primary); font-weight: 600; background: var(--bg-code); padding: 4px 8px; border-radius: 4px;">/users/me</code>
+                            <span style="font-size: 12px; color: var(--text-muted); margin-left: auto;">更新用户信息</span>
+                        </div>
+                        <div class="api-detail-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求头参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px;">
+                                    <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--accent);">Authorization</code>
+                                    <span>string类型，必填</span> — Bearer Token（格式：Bearer {token}）
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-primary); font-weight: 600;">请求体参数：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">nickname</code>
+                                        <span>string类型，可选</span> — 新昵称（2-20位字符）
+                                    </div>
+                                    <div>
+                                        <code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">avatar</code>
+                                        <span>string类型，可选</span> — 新头像URL
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-primary); font-weight: 600;">响应数据：</span>
+                                <div style="margin-left: 12px; margin-top: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">userId</code> 用户唯一标识ID</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">nickname</code> 更新后的昵称</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">avatar</code> 更新后的头像URL</div>
+                                    <div><code style="background: var(--bg-code); padding: 2px 6px; border-radius: 3px;">updatedAt</code> 更新时间</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1415,7 +1687,7 @@
     <div class="lesson-footer-bar">
         <div class="footer-bar-content">
             <div class="footer-nav">
-                <a href="lesson-1-2-detail.html" class="btn-nav">← 上一课</a>
+                <a href="lesson-1-4-detail.html" class="btn-nav">← 上一课</a>
                 <a href="phase1-detail.html" class="btn-nav">课程列表</a>
             </div>
             <button class="btn-complete" onclick="markComplete()">

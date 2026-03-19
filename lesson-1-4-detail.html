@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1.4 数据是如何流转的 - PM Tech Hub</title>
+    <title>1.3 数据是如何流转的 - PM Tech Hub</title>
     <style>
         :root {
             --bg-primary: #F5F3EF;
@@ -254,9 +254,9 @@
         .flow-container {
             display: flex;
             justify-content: center;
-            align-items: stretch;
-            gap: 16px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
 
         .flow-node {
@@ -264,13 +264,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            min-height: 90px;
+            gap: 6px;
+            min-height: 70px;
         }
 
         .flow-box {
-            width: 120px;
-            padding: 20px 16px;
+            width: 80px;
+            padding: 12px 10px;
             background: var(--bg-secondary);
             border-radius: 12px;
             box-shadow: var(--shadow-soft);
@@ -280,16 +280,17 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 90px;
+            min-height: 70px;
+            flex-shrink: 0;
         }
 
         .flow-box .icon {
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 22px;
+            margin-bottom: 4px;
         }
 
         .flow-box .label {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -315,22 +316,23 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            min-height: 90px;
+            gap: 2px;
+            min-height: 70px;
+            flex-shrink: 0;
         }
 
         .flow-arrow {
-            font-size: 20px;
+            font-size: 16px;
             color: var(--accent);
             line-height: 1;
         }
 
         .flow-label {
-            font-size: 11px;
+            font-size: 9px;
             color: var(--text-muted);
             background: var(--bg-secondary);
-            padding: 3px 8px;
-            border-radius: 8px;
+            padding: 2px 6px;
+            border-radius: 6px;
             white-space: nowrap;
         }
 
@@ -773,12 +775,38 @@
             }
 
             .flow-container {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 4px;
             }
 
             .flow-connector {
-                transform: rotate(90deg);
-                margin: 8px 0;
+                transform: none;
+                margin: 0;
+            }
+
+            .flow-box {
+                width: 60px;
+                padding: 8px 6px;
+                min-height: 55px;
+            }
+
+            .flow-box .icon {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .flow-box .label {
+                font-size: 9px;
+            }
+
+            .flow-label {
+                font-size: 8px;
+                padding: 1px 4px;
+            }
+
+            .flow-arrow {
+                font-size: 14px;
             }
 
             .scenario-grid {
@@ -862,13 +890,13 @@
             <span>›</span>
             <a href="phase1-detail.html">阶段一</a>
             <span>›</span>
-            <span class="current">1.4 数据是如何流转的</span>
+            <span class="current">1.3 数据是如何流转的</span>
         </nav>
 
         <!-- 课程头部 -->
         <header class="lesson-header">
             <div class="lesson-meta-bar">
-                <span class="lesson-number-badge">1.4</span>
+                <span class="lesson-number-badge">1.3</span>
                 <span class="lesson-type">⏱ 18分钟 · 📄 图文课程</span>
             </div>
             <h1>数据是如何流转的</h1>
@@ -1397,7 +1425,7 @@
         <div class="footer-bar-content">
             <div class="footer-nav">
                 <a href="lesson-1-2-detail.html" class="btn-nav">← 上一课</a>
-                <a href="phase1-detail.html" class="btn-nav">课程列表</a>
+                <a href="lesson-1-3-detail.html" class="btn-nav">下一课 →</a>
             </div>
             <button class="btn-complete" onclick="markComplete()">
                 <span>✓</span>
@@ -1556,25 +1584,35 @@
         }
         
         function highlightFlowNode(nodeName) {
-            // 重置所有节点
-            document.querySelectorAll('.flow-node').forEach(node => {
+            // 只选择带有 data-node 属性的 flow-node（交互式演示区域的节点）
+            document.querySelectorAll('.flow-node[data-node]').forEach(node => {
                 const icon = node.querySelector('.node-icon');
-                icon.style.borderColor = 'var(--border-light)';
-                icon.style.transform = 'scale(1)';
-                icon.style.boxShadow = 'none';
-                node.querySelector('.node-status').textContent = '待命';
-                node.querySelector('.node-status').style.color = 'var(--text-muted)';
+                if (icon) {
+                    icon.style.borderColor = 'var(--border-light)';
+                    icon.style.transform = 'scale(1)';
+                    icon.style.boxShadow = 'none';
+                }
+                const status = node.querySelector('.node-status');
+                if (status) {
+                    status.textContent = '待命';
+                    status.style.color = 'var(--text-muted)';
+                }
             });
-            
+
             // 高亮目标节点
             const targetNode = document.querySelector(`.flow-node[data-node="${nodeName}"]`);
             if (targetNode) {
                 const icon = targetNode.querySelector('.node-icon');
-                icon.style.borderColor = 'var(--accent)';
-                icon.style.transform = 'scale(1.1)';
-                icon.style.boxShadow = '0 4px 20px rgba(232, 111, 81, 0.3)';
-                targetNode.querySelector('.node-status').textContent = '处理中';
-                targetNode.querySelector('.node-status').style.color = 'var(--accent)';
+                if (icon) {
+                    icon.style.borderColor = 'var(--accent)';
+                    icon.style.transform = 'scale(1.1)';
+                    icon.style.boxShadow = '0 4px 20px rgba(232, 111, 81, 0.3)';
+                }
+                const status = targetNode.querySelector('.node-status');
+                if (status) {
+                    status.textContent = '处理中';
+                    status.style.color = 'var(--accent)';
+                }
             }
         }
         
@@ -1591,20 +1629,25 @@
         function resetFlowAnimation() {
             isAnimating = false;
             currentStepIndex = -1;
-            
+
             if (animationTimer) {
                 clearTimeout(animationTimer);
                 animationTimer = null;
             }
-            
-            // 重置所有节点
-            document.querySelectorAll('.flow-node').forEach(node => {
+
+            // 重置所有节点（只选择带有 data-node 属性的节点）
+            document.querySelectorAll('.flow-node[data-node]').forEach(node => {
                 const icon = node.querySelector('.node-icon');
-                icon.style.borderColor = 'var(--border-light)';
-                icon.style.transform = 'scale(1)';
-                icon.style.boxShadow = 'none';
-                node.querySelector('.node-status').textContent = '待命';
-                node.querySelector('.node-status').style.color = 'var(--text-muted)';
+                if (icon) {
+                    icon.style.borderColor = 'var(--border-light)';
+                    icon.style.transform = 'scale(1)';
+                    icon.style.boxShadow = 'none';
+                }
+                const status = node.querySelector('.node-status');
+                if (status) {
+                    status.textContent = '待命';
+                    status.style.color = 'var(--text-muted)';
+                }
             });
             
             // 重置详情面板
