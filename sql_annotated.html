@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL 代码详解</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #d4d4d4;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+        .purpose {
+            background: linear-gradient(135deg, #2d4a3e 0%, #1e3a2f 100%);
+            border-left: 5px solid #4CAF50;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .purpose strong {
+            color: #4CAF50;
+            font-size: 16px;
+        }
+        .sql-line {
+            margin: 12px 0;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .sql-code {
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .keyword {
+            color: #569cd6;
+            font-weight: bold;
+        }
+        .function {
+            color: #dcdcaa;
+        }
+        .string {
+            color: #ce9178;
+        }
+        .comment {
+            color: #6a9955;
+            font-style: italic;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+        .indent {
+            padding-left: 30px;
+        }
+        .multi-comment {
+            color: #6a9955;
+            font-style: italic;
+            margin: 10px 0 10px 30px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .summary {
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #444;
+            margin-top: 25px;
+        }
+        .summary h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #444;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        td:first-child {
+            width: 35%;
+            color: #dcdcaa;
+            font-weight: bold;
+        }
+        .icon {
+            margin-right: 8px;
+        }
+        .result-preview {
+            background: #252526;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid #444;
+        }
+        .result-preview h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .result-table th {
+            background: #3c3c3c;
+            padding: 12px 15px;
+            text-align: left;
+            color: #569cd6;
+            font-weight: bold;
+        }
+        .result-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #444;
+            color: #d4d4d4;
+        }
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+        .highlight-box {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            color: #b8b8b8;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 SQL 代码详解 - 订单统计分析</h1>
+        
+        <div class="code-block">
+            <div class="purpose">
+                <strong>🎯 查询目的：</strong>统计最近7天的订单数量和每日收入
+            </div>
+            
+            <div class="sql-line">
+                <span class="sql-code"><span class="keyword">SELECT</span></span>
+                <span class="comment">-- 选择要查询的列</span>
+            </div>
+            
+            <div class="sql-line indent">
+                <span class="sql-code"><span class="function">DATE</span>(created_at) <span class="keyword">AS</span> order_date,</span>
+                <span class="comment"><span class="icon">📅</span>将创建时间转换为日期格式，命名为 order_date</span>
+            </div>
+            
+            <div class="sql-line indent">
+                <span class="sql-code"><span class="function">COUNT</span>(*) <span class="keyword">AS</span> order_count,</span>
+                <span class="comment"><span class="icon">🔢</span>统计每天的订单数量</span>
+            </div>
+            
+            <div class="sql-line indent">
+                <span class="sql-code"><span class="function">SUM</span>(total_amount) <span class="keyword">AS</span> daily_revenue</span>
+                <span class="comment"><span class="icon">💰</span>计算每天的总收入</span>
+            </div>
+            
+            <div class="sql-line">
+                <span class="sql-code"><span class="keyword">FROM</span> orders</span>
+                <span class="comment"><span class="icon">📋</span>从 orders 表中查询数据</span>
+            </div>
+            
+            <div class="sql-line">
+                <span class="sql-code"><span class="keyword">WHERE</span> created_at >= <span class="function">DATE_SUB</span>(<span class="function">CURDATE</span>(), <span class="keyword">INTERVAL</span> <span class="string">7</span> <span class="keyword">DAY</span>)</span>
+                <span class="comment"><span class="icon">⏰</span>筛选条件：只查询最近7天的数据</span>
+            </div>
+            
+            <div class="multi-comment">
+                <div>/*</div>
+                <div style="padding-left: 15px;">CURDATE() = 当前日期</div>
+                <div style="padding-left: 15px;">DATE_SUB(日期, INTERVAL 7 DAY) = 日期减去7天</div>
+                <div style="padding-left: 15px;">所以这是查询从今天往前推7天的记录</div>
+                <div>*/</div>
+            </div>
+            
+            <div class="sql-line">
+                <span class="sql-code"><span class="keyword">GROUP BY</span> <span class="function">DATE</span>(created_at)</span>
+                <span class="comment"><span class="icon">📊</span>按日期分组，这样每天只有一条汇总记录</span>
+            </div>
+            
+            <div class="sql-line">
+                <span class="sql-code"><span class="keyword">ORDER BY</span> order_date <span class="keyword">DESC</span>;</span>
+                <span class="comment"><span class="icon">📉</span>按日期降序排列（最新的日期在前面）</span>
+            </div>
+        </div>
+        
+        <div class="summary">
+            <h2>🎓 核心知识点总结</h2>
+            <table>
+                <tr>
+                    <td>DATE()</td>
+                    <td>提取日期部分，去掉时间</td>
+                </tr>
+                <tr>
+                    <td>COUNT(*)</td>
+                    <td>统计行数</td>
+                </tr>
+                <tr>
+                    <td>SUM()</td>
+                    <td>求和函数</td>
+                </tr>
+                <tr>
+                    <td>DATE_SUB()</td>
+                    <td>日期减法</td>
+                </tr>
+                <tr>
+                    <td>CURDATE()</td>
+                    <td>获取当前日期</td>
+                </tr>
+                <tr>
+                    <td>GROUP BY</td>
+                    <td>分组聚合</td>
+                </tr>
+                <tr>
+                    <td>ORDER BY ... DESC</td>
+                    <td>降序排序</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="result-preview">
+            <h2>📈 查询结果示例</h2>
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>order_date</th>
+                        <th>order_count</th>
+                        <th>daily_revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-03-19</td>
+                        <td>25</td>
+                        <td>¥15,800</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-18</td>
+                        <td>32</td>
+                        <td>¥22,500</td>
+                    </tr>
+                    <tr>
+                        <td>2026-03-17</td>
+                        <td>28</td>
+                        <td>¥18,200</td>
+                    </tr>
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="highlight-box">
+                <strong>💡 应用场景：</strong>这个查询是数据分析中非常典型的<strong>时间序列聚合查询</strong>，常用于生成日报、仪表盘、销售趋势分析等场景。通过 GROUP BY 将数据按天聚合，可以快速了解业务的时间分布规律。
+            </div>
+        </div>
+    </div>
+</body>
+</html>
