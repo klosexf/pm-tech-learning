@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.3 SQL 基础与数据查询 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --info: #1890FF;
+            --warning: #FAAD14;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .progress-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-mini-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--bg-code);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-mini-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 100px;
+        }
+
+        /* 面包屑 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb .current {
+            color: var(--text-secondary);
+        }
+
+        /* 课程头部 */
+        .lesson-header {
+            margin-bottom: 48px;
+        }
+
+        .lesson-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .lesson-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--accent);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
+        .lesson-type {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lesson-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .lesson-intro {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 680px;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .content-section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-primary);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.9;
+        }
+
+        /* 高亮框 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.08) 0%, rgba(245, 166, 35, 0.08) 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin: 28px 0;
+        }
+
+        .highlight-box h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .highlight-box li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .highlight-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* 代码块 */
+        .code-block {
+            background: var(--bg-code);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border-left: 4px solid var(--accent);
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .code-lang {
+            padding: 4px 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        .code-title {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .code-content {
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .code-keyword { color: var(--accent); font-weight: 600; }
+        .code-string { color: var(--success); }
+        .code-comment { color: var(--text-muted); font-style: italic; }
+        .code-function { color: var(--info); }
+
+        /* 要点列表 */
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin: 28px 0;
+        }
+
+        .key-point-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .key-point-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .key-point-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .key-point-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .key-point-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* 查询示例卡片 */
+        .query-example {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 20px 0;
+            border-left: 4px solid var(--info);
+        }
+
+        .query-example h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .query-example p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        /* SQL 关键词表格 */
+        .sql-keywords {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+
+        .sql-keywords th,
+        .sql-keywords td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sql-keywords th {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+        }
+
+        .sql-keywords td {
+            color: var(--text-secondary);
+        }
+
+        .sql-keywords code {
+            background: var(--bg-code);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 底部操作栏 */
+        .lesson-footer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 16px 24px;
+            z-index: 100;
+        }
+
+        .footer-bar-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-complete {
+            padding: 12px 32px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-complete:hover {
+            background: #389E0D;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 90px 16px 100px;
+            }
+
+            .lesson-header h1 {
+                font-size: 28px;
+            }
+
+            .content-section {
+                padding: 24px;
+            }
+
+            .key-points {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bar-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-complete {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-section {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .content-section:nth-child(1) { animation-delay: 0.1s; }
+        .content-section:nth-child(2) { animation-delay: 0.2s; }
+        .content-section:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <div class="nav-actions">
+                <div class="progress-mini">
+                    <span>课程进度</span>
+                    <div class="progress-mini-bar">
+                        <div class="progress-mini-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 面包屑 -->
+        <nav class="breadcrumb">
+            <a href="index.html">学习路径</a>
+            <span>›</span>
+            <a href="phase2-detail.html">阶段二</a>
+            <span>›</span>
+            <span class="current">2.3 SQL 基础与数据查询</span>
+        </nav>
+
+        <!-- 课程头部 -->
+        <header class="lesson-header">
+            <div class="lesson-meta-bar">
+                <span class="lesson-number-badge">2.3</span>
+                <span class="lesson-type">⏱ 30分钟 · 💻 实战练习</span>
+            </div>
+            <h1>SQL 基础与数据查询</h1>
+            <p class="lesson-intro">
+                掌握 SQL 的核心语法，学会编写高效的数据查询语句。从基础 SELECT 到复杂的 JOIN 和子查询，
+                配合产品经理常用的数据分析场景，让你能够自主验证产品数据、排查业务问题。
+            </p>
+        </header>
+
+        <!-- 第一节：SQL 基础语法 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📝</span>
+                SQL 基础语法
+            </h2>
+            
+            <p>
+                SQL（Structured Query Language）是操作关系型数据库的标准语言。掌握 SQL 基础语法，
+                可以帮助产品经理快速查询数据、验证产品逻辑、分析业务指标。
+            </p>
+
+            <div class="highlight-box">
+                <h4>💡 产品经理学 SQL 的核心价值</h4>
+                <ul>
+                    <li><strong>数据验证</strong>：新功能上线后，快速验证数据是否按预期写入</li>
+                    <li><strong>问题排查</strong>：用户反馈问题时，查询相关订单/操作记录</li>
+                    <li><strong>业务分析</strong>：自主分析数据，不用每次都找开发同学</li>
+                    <li><strong>需求评估</strong>：了解现有数据结构，更准确评估新需求</li>
+                </ul>
+            </div>
+
+            <h3>SQL 语句基本结构</h3>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">SQL</span>
+                    <span class="code-title">基础查询语句结构</span>
+                </div>
+                <div class="code-content">
+<span class="code-keyword">SELECT</span> 列名1, 列名2, ...       <span class="code-comment">-- 选择要查询的字段</span><br>
+<span class="code-keyword">FROM</span> 表名                   <span class="code-comment">-- 从哪个表查询</span><br>
+<span class="code-keyword">WHERE</span> 条件                 <span class="code-comment">-- 筛选条件（可选）</span><br>
+<span class="code-keyword">GROUP BY</span> 分组字段          <span class="code-comment">-- 分组统计（可选）</span><br>
+<span class="code-keyword">HAVING</span> 分组条件            <span class="code-comment">-- 分组后筛选（可选）</span><br>
+<span class="code-keyword">ORDER BY</span> 排序字段 [ASC|DESC]  <span class="code-comment">-- 排序（可选）</span><br>
+<span class="code-keyword">LIMIT</span> 数量;                <span class="code-comment">-- 限制返回条数（可选）</span>
+                </div>
+            </div>
+
+            <h3>常用 SQL 关键字</h3>
+            
+            <table class="sql-keywords">
+                <thead>
+                    <tr>
+                        <th>关键字</th>
+                        <th>用途</th>
+                        <th>示例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>SELECT</code></td>
+                        <td>选择要查询的字段，* 表示所有字段</td>
+                        <td>SELECT * FROM users</td>
+                    </tr>
+                    <tr>
+                        <td><code>WHERE</code></td>
+                        <td>设置查询条件，筛选数据</td>
+                        <td>WHERE status = 1</td>
+                    </tr>
+                    <tr>
+                        <td><code>AND/OR</code></td>
+                        <td>组合多个条件</td>
+                        <td>WHERE a = 1 AND b = 2</td>
+                    </tr>
+                    <tr>
+                        <td><code>ORDER BY</code></td>
+                        <td>排序，ASC 升序，DESC 降序</td>
+                        <td>ORDER BY created_at DESC</td>
+                    </tr>
+                    <tr>
+                        <td><code>LIMIT</code></td>
+                        <td>限制返回结果数量</td>
+                        <td>LIMIT 10</td>
+                    </tr>
+                    <tr>
+                        <td><code>DISTINCT</code></td>
+                        <td>去重，返回唯一值</td>
+                        <td>SELECT DISTINCT city</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 第二节：基础查询实战 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🔍</span>
+                基础查询实战
+            </h2>
+
+            <p>
+                通过实际案例学习 SQL 查询。假设我们有一个电商订单系统，包含用户表 users 和订单表 orders。
+            </p>
+
+            <div class="query-example">
+                <h4>📌 示例 1：查询所有用户</h4>
+                <p>获取用户表中的所有用户信息</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> users;<br><br>
+<span class="code-comment">-- 只查询指定字段</span><br>
+<span class="code-keyword">SELECT</span> user_id, username, email <span class="code-keyword">FROM</span> users;
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 2：带条件的查询</h4>
+                <p>查询状态为正常的用户</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">WHERE</span> status = <span class="code-string">1</span>;<br><br>
+
+<span class="code-comment">-- 多条件查询</span><br>
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">WHERE</span> status = <span class="code-string">1</span> <span class="code-keyword">AND</span> created_at >= <span class="code-string">'2024-01-01'</span>;<br><br>
+
+<span class="code-comment">-- OR 条件查询</span><br>
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">WHERE</span> city = <span class="code-string">'北京'</span> <span class="code-keyword">OR</span> city = <span class="code-string">'上海'</span>;
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 3：排序和分页</h4>
+                <p>查询最新注册的10个用户</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 按注册时间倒序，取前10条</span><br>
+<span class="code-keyword">SELECT</span> user_id, username, created_at<br>
+<span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">ORDER BY</span> created_at <span class="code-keyword">DESC</span><br>
+<span class="code-keyword">LIMIT</span> <span class="code-string">10</span>;<br><br>
+
+<span class="code-comment">-- 分页查询：第2页，每页20条</span><br>
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">LIMIT</span> <span class="code-string">20</span> <span class="code-keyword">OFFSET</span> <span class="code-string">20</span>;
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>⚠️ 常用 WHERE 条件写法</h4>
+                <ul>
+                    <li><code>=</code> 等于、<code>!=</code> 或 <code>&lt;&gt;</code> 不等于</li>
+                    <li><code>&gt;</code> 大于、<code>&lt;</code> 小于、<code>&gt;=</code> 大于等于、<code>&lt;=</code> 小于等于</li>
+                    <li><code>BETWEEN</code> 范围查询，如 <code>age BETWEEN 18 AND 30</code></li>
+                    <li><code>IN</code> 多值匹配，如 <code>city IN ('北京', '上海', '广州')</code></li>
+                    <li><code>LIKE</code> 模糊查询，如 <code>username LIKE '%张%'</code></li>
+                    <li><code>IS NULL</code> / <code>IS NOT NULL</code> 空值判断</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 第三节：数据统计与聚合 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">📊</span>
+                数据统计与聚合
+            </h2>
+
+            <p>
+                聚合函数是数据分析的利器，可以快速统计业务指标。产品经理最常用的就是这类查询。
+            </p>
+
+            <div class="key-points">
+                <div class="key-point-card">
+                    <div class="key-point-icon">🔢</div>
+                    <h4>COUNT()</h4>
+                    <p>统计记录数量。<br>如：统计总用户数、订单数</p>
+                </div>
+                <div class="key-point-card">
+                    <div class="key-point-icon">➕</div>
+                    <h4>SUM()</h4>
+                    <p>求和计算。<br>如：计算总销售额、总积分</p>
+                </div>
+                <div class="key-point-card">
+                    <div class="key-point-icon">📈</div>
+                    <h4>AVG()</h4>
+                    <p>平均值计算。<br>如：平均客单价、平均年龄</p>
+                </div>
+                <div class="key-point-card">
+                    <div class="key-point-icon">⚡</div>
+                    <h4>MAX/MIN</h4>
+                    <p>最大最小值。<br>如：最高订单金额、最早注册时间</p>
+                </div>
+            </div>
+
+            <h3>聚合查询实战</h3>
+
+            <div class="query-example">
+                <h4>📌 示例 4：统计用户总数</h4>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 统计总用户数</span><br>
+<span class="code-keyword">SELECT</span> <span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> total_users <span class="code-keyword">FROM</span> users;<br><br>
+
+<span class="code-comment">-- 统计今日新增用户</span><br>
+<span class="code-keyword">SELECT</span> <span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> new_users<br>
+<span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">WHERE</span> <span class="code-function">DATE</span>(created_at) = <span class="code-function">CURDATE</span>();
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 5：分组统计（GROUP BY）</h4>
+                <p>统计各状态订单数量和金额</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;status,<br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> order_count,<br>
+&nbsp;&nbsp;<span class="code-function">SUM</span>(total_amount) <span class="code-keyword">AS</span> total_revenue,<br>
+&nbsp;&nbsp;<span class="code-function">AVG</span>(total_amount) <span class="code-keyword">AS</span> avg_amount<br>
+<span class="code-keyword">FROM</span> orders<br>
+<span class="code-keyword">WHERE</span> created_at >= <span class="code-string">'2024-01-01'</span><br>
+<span class="code-keyword">GROUP BY</span> status;<br><br>
+
+<span class="code-comment">-- 带条件的分组统计（HAVING）</span><br>
+<span class="code-keyword">SELECT</span> user_id, <span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> order_count<br>
+<span class="code-keyword">FROM</span> orders<br>
+<span class="code-keyword">GROUP BY</span> user_id<br>
+<span class="code-keyword">HAVING</span> order_count >= <span class="code-string">5</span>;<br>
+<span class="code-comment">-- 查询下单5次以上的用户</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>📌 SQL 关键字解析</h4>
+                <ul>
+                    <li><strong>SELECT</strong>：选择要查询的字段，* 表示全部字段</li>
+                    <li><strong>AS</strong>：为查询结果中的列或表设置别名，增强可读性</li>
+                    <li><strong>FROM</strong>：指定查询的数据表</li>
+                    <li><strong>WHERE</strong>：筛选条件，支持 AND、OR 组合多个条件</li>
+                    <li><strong>GROUP BY</strong>：按指定字段对数据进行分组，常与聚合函数配合使用</li>
+                </ul>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 6：多维度数据分析</h4>
+                <p>按日期统计每日订单量和销售额</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 查询目的：统计最近7天每天的订单数量和收入（常用于日报、仪表盘）</span><br>
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;<span class="code-function">DATE</span>(created_at) <span class="code-keyword">AS</span> order_date,<br>
+&nbsp;&nbsp;<span class="code-comment">-- DATE() 函数：从日期时间中提取日期部分（去掉时分秒）</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- AS order_date：给查询结果起别名，增强可读性</span><br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> order_count,<br>
+&nbsp;&nbsp;<span class="code-comment">-- COUNT(*)：统计每天的订单数量</span><br>
+&nbsp;&nbsp;<span class="code-function">SUM</span>(total_amount) <span class="code-keyword">AS</span> daily_revenue<br>
+&nbsp;&nbsp;<span class="code-comment">-- SUM()：计算每天的总收入（GMV）</span><br>
+<span class="code-keyword">FROM</span> orders<br>
+<span class="code-keyword">WHERE</span> created_at >= <span class="code-function">DATE_SUB</span>(<span class="code-function">CURDATE</span>(), <span class="code-keyword">INTERVAL</span> <span class="code-string">7</span> <span class="code-keyword">DAY</span>)<br>
+&nbsp;&nbsp;<span class="code-comment">-- CURDATE()：获取当前日期（如 2026-03-19）</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- DATE_SUB(日期, INTERVAL 7 DAY)：日期减去7天</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- 整体含义：筛选最近7天的订单记录</span><br>
+<span class="code-keyword">GROUP BY</span> <span class="code-function">DATE</span>(created_at)<br>
+&nbsp;&nbsp;<span class="code-comment">-- GROUP BY：按日期分组，将同一天的所有订单合并成一条记录</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- 这样 COUNT 和 SUM 就会分别统计每一天的数据</span><br>
+<span class="code-keyword">ORDER BY</span> order_date <span class="code-keyword">DESC</span>;<br>
+&nbsp;&nbsp;<span class="code-comment">-- ORDER BY ... DESC：按日期降序排列，最新的日期显示在最前面</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- ASC 表示升序（从小到大），DESC 表示降序（从大到小）</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四节：表关联查询 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">🔗</span>
+                表关联查询（JOIN）
+            </h2>
+
+            <p>
+                实际业务中，数据往往分散在多个表中。JOIN 用于关联查询多个表的数据，是 SQL 中最重要的技能之一。
+            </p>
+
+            <div class="highlight-box">
+                <h4>🔗 JOIN 类型说明</h4>
+                <ul>
+                    <li><strong>INNER JOIN</strong>：只返回两个表匹配的数据（最常用）</li>
+                    <li><strong>LEFT JOIN</strong>：返回左表所有数据，右表不匹配填 NULL</li>
+                    <li><strong>RIGHT JOIN</strong>：返回右表所有数据，左表不匹配填 NULL</li>
+                    <li><strong>FULL JOIN</strong>：返回两个表的所有数据（MySQL 不支持）</li>
+                </ul>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 7：INNER JOIN 基础关联</h4>
+                <p>查询订单及对应的用户信息</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 查询目的：查询已支付订单及对应的用户信息（关联查询示例）</span><br>
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;o.order_id,<br>
+&nbsp;&nbsp;<span class="code-comment">-- o.order_id：使用表别名 o 引用 orders 表的 order_id 字段</span><br>
+&nbsp;&nbsp;o.total_amount,<br>
+&nbsp;&nbsp;<span class="code-comment">-- o.total_amount：订单金额</span><br>
+&nbsp;&nbsp;u.username,<br>
+&nbsp;&nbsp;<span class="code-comment">-- u.username：使用表别名 u 引用 users 表的 username 字段</span><br>
+&nbsp;&nbsp;u.phone<br>
+&nbsp;&nbsp;<span class="code-comment">-- u.phone：用户手机号</span><br>
+<span class="code-keyword">FROM</span> orders o<br>
+&nbsp;&nbsp;<span class="code-comment">-- FROM orders o：指定主表为 orders，并设置别名为 o（简化后续书写）</span><br>
+<span class="code-keyword">INNER JOIN</span> users u <span class="code-keyword">ON</span> o.user_id = u.user_id<br>
+&nbsp;&nbsp;<span class="code-comment">-- INNER JOIN：内连接，只返回两个表中匹配的记录</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- users u：指定要关联的表为 users，别名为 u</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- ON o.user_id = u.user_id：关联条件，orders表的user_id等于users表的user_id</span><br>
+<span class="code-keyword">WHERE</span> o.status = <span class="code-string">'paid'</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- WHERE：筛选条件，只查询状态为 'paid'（已支付）的订单</span><br>
+<span class="code-keyword">ORDER BY</span> o.created_at <span class="code-keyword">DESC</span><br>
+&nbsp;&nbsp;<span class="code-comment">-- ORDER BY o.created_at DESC：按订单创建时间降序排列，最新订单在前</span><br>
+<span class="code-keyword">LIMIT</span> <span class="code-string">20</span>;<br>
+&nbsp;&nbsp;<span class="code-comment">-- LIMIT 20：只返回前20条记录（分页查询常用）</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 8：LEFT JOIN 保留左表数据</h4>
+                <p>查询所有用户及其订单数（包括未下单的用户）</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;u.user_id,<br>
+&nbsp;&nbsp;u.username,<br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(o.order_id) <span class="code-keyword">AS</span> order_count<br>
+<span class="code-keyword">FROM</span> users u<br>
+<span class="code-keyword">LEFT JOIN</span> orders o <span class="code-keyword">ON</span> u.user_id = o.user_id<br>
+<span class="code-keyword">GROUP BY</span> u.user_id, u.username;<br>
+<span class="code-comment">-- 未下单的用户会显示 order_count = 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-example">
+                <h4>📌 示例 9：多表关联</h4>
+                <p>查询订单详情，包含用户信息、商品信息</p>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;o.order_id,<br>
+&nbsp;&nbsp;u.username,<br>
+&nbsp;&nbsp;p.product_name,<br>
+&nbsp;&nbsp;oi.quantity,<br>
+&nbsp;&nbsp;oi.subtotal<br>
+<span class="code-keyword">FROM</span> orders o<br>
+<span class="code-keyword">JOIN</span> users u <span class="code-keyword">ON</span> o.user_id = u.user_id<br>
+<span class="code-keyword">JOIN</span> order_items oi <span class="code-keyword">ON</span> o.order_id = oi.order_id<br>
+<span class="code-keyword">JOIN</span> products p <span class="code-keyword">ON</span> oi.product_id = p.product_id<br>
+<span class="code-keyword">WHERE</span> o.order_id = <span class="code-string">'ORD2024001'</span>;
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 交互式学习：SQL语句模拟执行器 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">⚡</span>
+                互动练习：SQL 语句模拟执行器
+            </h2>
+            
+            <p>
+                在下方输入 SQL 语句，模拟执行查询操作。选择预设的查询模板或自由编写，实时查看执行结果。
+            </p>
+
+            <!-- 源数据说明 -->
+            <div style="background: var(--bg-secondary); border-radius: 16px; padding: 24px; margin: 24px 0; border: 2px solid var(--border-light);">
+                <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <span>📊</span> 源数据表结构说明
+                </h3>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                    本模拟器使用以下三张数据表，所有查询操作均基于这些表的真实数据：
+                </p>
+                
+                <!-- users 表 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 10px; font-family: monospace;">users (用户表)</h4>
+                    <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <thead>
+                                <tr style="background: var(--bg-code);">
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">id</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">username</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">email</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">phone</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">status</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">created_at</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">张三</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">zhangsan@example.com</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">13800138000</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2024-01-15 10:30:00</td></tr>
+                                <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">李四</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">lisi@example.com</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">13900139000</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2024-01-14 09:20:00</td></tr>
+                                <tr><td style="padding: 8px 12px;">3</td><td style="padding: 8px 12px;">王五</td><td style="padding: 8px 12px;">wangwu@example.com</td><td style="padding: 8px 12px;">13700137000</td><td style="padding: 8px 12px;">0</td><td style="padding: 8px 12px;">2024-01-13 08:10:00</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- orders 表 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 10px; font-family: monospace;">orders (订单表)</h4>
+                    <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <thead>
+                                <tr style="background: var(--bg-code);">
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">order_id</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">user_id</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">total_amount</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">status</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">created_at</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">ORD001</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">299.00</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">paid</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2024-01-15 14:30:00</td></tr>
+                                <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">ORD002</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">599.00</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">pending</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2024-01-15 13:20:00</td></tr>
+                                <tr><td style="padding: 8px 12px;">ORD003</td><td style="padding: 8px 12px;">1</td><td style="padding: 8px 12px;">199.00</td><td style="padding: 8px 12px;">shipped</td><td style="padding: 8px 12px;">2024-01-14 11:00:00</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- products 表 -->
+                <div>
+                    <h4 style="font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 10px; font-family: monospace;">products (商品表)</h4>
+                    <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                            <thead>
+                                <tr style="background: var(--bg-code);">
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">id</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">name</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">price</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">stock</th>
+                                    <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-weight: 600;">category_id</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">商品A</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">99.00</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">100</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td></tr>
+                                <tr><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">2</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">商品B</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">199.00</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">50</td><td style="padding: 8px 12px; border-bottom: 1px solid var(--border-light);">1</td></tr>
+                                <tr><td style="padding: 8px 12px;">3</td><td style="padding: 8px 12px;">商品C</td><td style="padding: 8px 12px;">299.00</td><td style="padding: 8px 12px;">30</td><td style="padding: 8px 12px;">2</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px; padding: 12px; background: rgba(24, 144, 255, 0.08); border-radius: 8px;">
+                    <p style="font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+                        <strong style="color: var(--info);">💡 表关系说明：</strong><br>
+                        • orders.user_id 关联 users.id（一个用户可以有多个订单）<br>
+                        • 所有查询均基于上述真实数据执行，结果可复现
+                    </p>
+                </div>
+            </div>
+            
+            <div style="background: var(--bg-primary); border-radius: 16px; padding: 24px; margin-top: 24px;">
+                <!-- 模板选择 -->
+                <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="sql-template-btn active" data-template="select" style="padding: 8px 16px; background: var(--bg-secondary); border: 2px solid var(--accent); border-radius: 16px; font-size: 13px; color: var(--accent); font-weight: 600; cursor: pointer;">
+                        基础查询
+                    </button>
+                    <button class="sql-template-btn" data-template="aggregate" style="padding: 8px 16px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: 16px; font-size: 13px; color: var(--text-secondary); cursor: pointer;">
+                        聚合统计
+                    </button>
+                    <button class="sql-template-btn" data-template="join" style="padding: 8px 16px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: 16px; font-size: 13px; color: var(--text-secondary); cursor: pointer;">
+                        表关联
+                    </button>
+                    <button class="sql-template-btn" data-template="custom" style="padding: 8px 16px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: 16px; font-size: 13px; color: var(--text-secondary); cursor: pointer;">
+                        自由输入
+                    </button>
+                </div>
+                
+                <!-- SQL 编辑器 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <!-- 表选择 -->
+                    <div>
+                        <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">选择数据表</label>
+                        <select id="sqlTableSelect" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; color: var(--text-primary); background: var(--bg-secondary);">
+                            <option value="users">users (用户表)</option>
+                            <option value="orders">orders (订单表)</option>
+                            <option value="products">products (商品表)</option>
+                        </select>
+                    </div>
+                    <!-- 字段选择 -->
+                    <div>
+                        <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">可用字段</label>
+                        <div id="availableFields" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SQL 输入区 -->
+                <div style="background: #1E1E1E; border-radius: 12px; padding: 20px; margin: 16px 0;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="font-size: 14px; font-weight: 600; color: #8B8B8B;">SQL 查询</span>
+                        <button id="clearSql" style="padding: 4px 12px; background: transparent; border: 1px solid #444; border-radius: 12px; color: #888; font-size: 12px; cursor: pointer;">
+                            清空
+                        </button>
+                    </div>
+                    <textarea id="sqlInput" style="width: 100%; height: 300px; background: transparent; border: none; color: #E8E8E8; font-family: 'SF Mono', Monaco, monospace; font-size: 14px; line-height: 1.6; resize: none; outline: none;" placeholder="输入 SQL 语句...
+SELECT * FROM users
+WHERE status = 1
+LIMIT 10;"></textarea>
+                </div>
+                
+                <!-- 执行按钮 -->
+                <div style="display: flex; justify-content: center; gap: 12px; margin-top: 16px;">
+                    <button id="executeSql" style="padding: 12px 32px; background: var(--accent); color: white; border: none; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        ▶ 执行查询
+                    </button>
+                    <button id="formatSql" style="padding: 12px 24px; background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-light); border-radius: 20px; font-size: 14px; cursor: pointer;">
+                        格式化
+                    </button>
+                </div>
+                
+                <!-- 执行结果 -->
+                <div id="sqlResult" style="margin-top: 20px; display: none;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                        <span style="font-size: 14px; font-weight: 600; color: var(--success);">✓ 执行成功</span>
+                        <span id="rowCount" style="font-size: 13px; color: var(--text-muted);">返回 0 条记录</span>
+                    </div>
+                    <div id="resultTable" style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <!-- 动态生成结果表格 -->
+                    </div>
+                </div>
+                
+                <!-- 查询提示 -->
+                <div id="sqlHint" style="margin-top: 20px; padding: 16px; background: rgba(24, 144, 255, 0.08); border-radius: 12px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--info); margin-bottom: 8px;">💡 查询提示</div>
+                    <div id="hintContent" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                        选择模板或输入SQL语句开始练习
+                    </div>
+                </div>
+            </div>
+            
+            <div class="highlight-box" style="margin-top: 24px;">
+                <h4>📚 娡板说明</h4>
+                <ul>
+                    <li><strong>基础查询</strong>：SELECT、WHERE、ORDER BY、 LIMIT 的组合使用</li>
+                    <li><strong>聚合统计</strong>：COUNT、 SUM、 AVG、 GROUP BY 的数据分析</li>
+                    <li><strong>表关联</strong>：INNER JOIN、 LEFT JOIN 的多表查询</li>
+                    <li><strong>自由输入</strong>：编写你自己的SQL语句，                </ul>
+            </div>
+        </section>
+
+        <!-- 第五节：产品经理实战场景 -->
+        <section class="content-section">
+            <h2>
+                <span class="section-icon">💼</span>
+                产品经理实战场景
+            </h2>
+
+            <p>
+                掌握这些 SQL 查询技能，你可以独立完成日常的数据验证和分析工作。
+            </p>
+
+            <h3>场景一：验证新功能数据</h3>
+            
+            <div class="query-example">
+                <h4>🎯 检查优惠券功能是否正常</h4>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 查看今天使用优惠券的订单</span><br>
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;order_id,<br>
+&nbsp;&nbsp;coupon_code,<br>
+&nbsp;&nbsp;discount_amount,<br>
+&nbsp;&nbsp;total_amount - discount_amount <span class="code-keyword">AS</span> final_amount<br>
+<span class="code-keyword">FROM</span> orders<br>
+<span class="code-keyword">WHERE</span> coupon_code <span class="code-keyword">IS NOT NULL</span><br>
+&nbsp;&nbsp;<span class="code-keyword">AND</span> <span class="code-function">DATE</span>(created_at) = <span class="code-function">CURDATE</span>()<br>
+<span class="code-keyword">LIMIT</span> <span class="code-string">20</span>;
+                    </div>
+                </div>
+            </div>
+
+            <h3>场景二：用户行为分析</h3>
+            
+            <div class="query-example">
+                <h4>🎯 分析用户留存情况</h4>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 查询最近30天每天的新增用户和活跃用户</span><br>
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;<span class="code-function">DATE</span>(created_at) <span class="code-keyword">AS</span> dt,<br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> new_users,<br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(<span class="code-keyword">DISTINCT</span> <span class="code-keyword">CASE</span> <span class="code-keyword">WHEN</span> last_login >= <span class="code-function">DATE_SUB</span>(<span class="code-function">CURDATE</span>(), <span class="code-keyword">INTERVAL</span> <span class="code-string">1</span> <span class="code-keyword">DAY</span>) <span class="code-keyword">THEN</span> user_id <span class="code-keyword">END</span>) <span class="code-keyword">AS</span> active_users<br>
+<span class="code-keyword">FROM</span> users<br>
+<span class="code-keyword">WHERE</span> created_at >= <span class="code-function">DATE_SUB</span>(<span class="code-function">CURDATE</span>(), <span class="code-keyword">INTERVAL</span> <span class="code-string">30</span> <span class="code-keyword">DAY</span>)<br>
+<span class="code-keyword">GROUP BY</span> <span class="code-function">DATE</span>(created_at)<br>
+<span class="code-keyword">ORDER BY</span> dt <span class="code-keyword">DESC</span>;
+                    </div>
+                </div>
+            </div>
+
+            <h3>场景三：业务指标监控</h3>
+            
+            <div class="query-example">
+                <h4>🎯 核心指标日报</h4>
+                <div class="code-block" style="margin: 0;">
+                    <div class="code-content">
+<span class="code-comment">-- 今日核心指标统计</span><br>
+<span class="code-keyword">SELECT</span> <br>
+&nbsp;&nbsp;<span class="code-string">'今日'</span> <span class="code-keyword">AS</span> period,<br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> order_count,<br>
+&nbsp;&nbsp;<span class="code-function">SUM</span>(total_amount) <span class="code-keyword">AS</span> gmv,<br>
+&nbsp;&nbsp;<span class="code-function">COUNT</span>(<span class="code-keyword">DISTINCT</span> user_id) <span class="code-keyword">AS</span> paid_users,<br>
+&nbsp;&nbsp;<span class="code-function">SUM</span>(total_amount) / <span class="code-function">COUNT</span>(*) <span class="code-keyword">AS</span> avg_order_value<br>
+<span class="code-keyword">FROM</span> orders<br>
+<span class="code-keyword">WHERE</span> <span class="code-function">DATE</span>(created_at) = <span class="code-function">CURDATE</span>()<br>
+&nbsp;&nbsp;<span class="code-keyword">AND</span> status = <span class="code-string">'paid'</span>;
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h4>✅ 产品经理 SQL 自查清单</h4>
+                <ul>
+                    <li>新功能上线后，第一时间验证数据是否正常写入</li>
+                    <li>遇到用户反馈时，快速查询相关数据排查问题</li>
+                    <li>每日关注核心指标：新增用户、订单量、GMV、转化率</li>
+                    <li>A/B 测试期间，验证分流比例和各组数据</li>
+                    <li>活动结束时，及时统计活动效果数据</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部操作栏 -->
+    <div class="lesson-footer-bar">
+        <div class="footer-bar-content">
+            <div class="footer-nav">
+                <a href="lesson-2-2-detail.html" class="btn-nav">← 上一课</a>
+            </div>
+            <button class="btn-complete" onclick="markComplete()">
+                <span>✓</span>
+                <span>标记为已完成</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 进度追踪
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollProgress = Math.round((scrollTop / docHeight) * 100);
+            
+            document.getElementById('progressFill').style.width = scrollProgress + '%';
+            document.getElementById('progressText').textContent = scrollProgress + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+        
+        // 标记完成
+        function markComplete() {
+            const btn = document.querySelector('.btn-complete');
+            btn.innerHTML = '<span>✓</span><span>已完成</span>';
+            btn.style.background = '#389E0D';
+            btn.style.cursor = 'default';
+            btn.onclick = null;
+            
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = '100%';
+            
+            setTimeout(() => {
+                alert('恭喜完成本课程！🎉');
+            }, 300);
+        }
+        
+        // 初始化
+        updateProgress();
+        
+        // ========== SQL语句模拟执行器 ==========
+        
+        // 动态SQL生成器 - 根据所选表和模板类型生成匹配的SQL
+        const sqlGenerators = {
+            // 基础查询模板生成器
+            select: (table) => {
+                const generators = {
+                    users: `-- 查询所有状态正常的用户
+-- 功能：查询用户表中状态为1（正常）的用户，按注册时间倒序排列
+SELECT 
+  id,                    -- 用户ID
+  username,              -- 用户名
+  email,                 -- 邮箱
+  phone,                 -- 手机号
+  status,                -- 状态：1正常，0禁用
+  created_at             -- 注册时间
+FROM users
+WHERE status = 1         -- 筛选正常状态的用户
+ORDER BY created_at DESC -- 按注册时间倒序排列（最新的在前）
+LIMIT 10;                -- 只返回前10条记录`,
+                    orders: `-- 查询已支付的订单
+-- 功能：查询订单表中状态为'paid'（已支付）的订单
+SELECT 
+  order_id,              -- 订单编号
+  user_id,               -- 关联的用户ID
+  total_amount,          -- 订单总金额
+  status,                -- 订单状态：paid已支付/pending待支付/shipped已发货
+  created_at             -- 下单时间
+FROM orders
+WHERE status = 'paid'    -- 筛选已支付的订单
+ORDER BY created_at DESC -- 按下单时间倒序排列
+LIMIT 10;                -- 只返回前10条记录`,
+                    products: `-- 查询库存充足的商品
+-- 功能：查询商品表中库存大于50的商品
+SELECT 
+  id,                    -- 商品ID
+  name,                  -- 商品名称
+  price,                 -- 单价
+  stock,                 -- 库存数量
+  category_id            -- 分类ID
+FROM products
+WHERE stock > 50         -- 筛选库存大于50的商品
+ORDER BY price ASC       -- 按价格升序排列
+LIMIT 10;                -- 只返回前10条记录`
+                };
+                return generators[table] || generators.users;
+            },
+            
+            // 聚合统计模板生成器
+            aggregate: (table) => {
+                const generators = {
+                    users: `-- 按状态统计用户数量
+-- 功能：统计不同状态（正常/禁用）的用户数量
+SELECT 
+  status,                           -- 用户状态
+  COUNT(*) AS user_count,           -- 统计每个状态的用户数量
+  COUNT(*) * 100.0 / (SELECT COUNT(*) FROM users) AS percentage  -- 占比
+FROM users
+GROUP BY status                     -- 按状态分组统计
+ORDER BY user_count DESC;           -- 按数量倒序排列`,
+                    orders: `-- 按订单状态统计金额
+-- 功能：统计各状态订单的数量和总金额
+SELECT 
+  status,                           -- 订单状态
+  COUNT(*) AS order_count,          -- 各状态订单数量
+  SUM(total_amount) AS total_revenue, -- 各状态订单总金额
+  AVG(total_amount) AS avg_amount   -- 各状态订单平均金额
+FROM orders
+WHERE created_at >= '2024-01-01'    -- 筛选2024年1月1日之后的订单
+GROUP BY status                     -- 按订单状态分组
+ORDER BY total_revenue DESC;        -- 按总金额倒序排列`,
+                    products: `-- 按分类统计商品
+-- 功能：统计各分类下的商品数量和平均价格
+SELECT 
+  category_id,                      -- 商品分类ID
+  COUNT(*) AS product_count,        -- 该分类下的商品数量
+  AVG(price) AS avg_price,          -- 该分类商品的平均价格
+  SUM(stock) AS total_stock         -- 该分类商品的总库存
+FROM products
+GROUP BY category_id                -- 按分类ID分组
+ORDER BY product_count DESC;        -- 按商品数量倒序排列`
+                };
+                return generators[table] || generators.users;
+            },
+            
+            // 表关联模板生成器
+            join: (table) => {
+                const generators = {
+                    users: `-- 查询用户及其订单信息（INNER JOIN）
+-- 功能：关联用户表和订单表，查询有订单的用户信息
+SELECT 
+  u.id AS user_id,         -- 用户ID（使用别名u引用users表）
+  u.username,              -- 用户名
+  u.email,                 -- 用户邮箱
+  o.order_id,              -- 订单编号（使用别名o引用orders表）
+  o.total_amount,          -- 订单金额
+  o.status AS order_status -- 订单状态
+FROM users u               -- FROM users并设置别名为u
+INNER JOIN orders o        -- INNER JOIN关联orders表，设置别名为o
+  ON u.id = o.user_id      -- 关联条件：users.id = orders.user_id
+WHERE o.status = 'paid'    -- 筛选已支付的订单
+ORDER BY o.created_at DESC -- 按订单时间倒序
+LIMIT 20;                  -- 限制返回20条`,
+                    orders: `-- 查询订单及用户信息（INNER JOIN）
+-- 功能：关联订单表和用户表，查询订单对应的用户信息
+SELECT 
+  o.order_id,              -- 订单编号
+  o.total_amount,          -- 订单金额
+  o.status,                -- 订单状态
+  u.username,              -- 下单用户名称
+  u.phone,                 -- 用户手机号
+  u.email                  -- 用户邮箱
+FROM orders o              -- FROM orders并设置别名为o
+INNER JOIN users u         -- INNER JOIN关联users表，设置别名为u
+  ON o.user_id = u.id      -- 关联条件：orders.user_id = users.id
+WHERE u.status = 1         -- 筛选正常状态的用户
+ORDER BY o.created_at DESC -- 按订单时间倒序
+LIMIT 20;`,
+                    products: `-- 查询商品信息（带分类统计）
+-- 功能：查询商品表，并统计各分类商品数量（子查询示例）
+SELECT 
+  p.id,                    -- 商品ID
+  p.name,                  -- 商品名称
+  p.price,                 -- 商品价格
+  p.stock,                 -- 库存数量
+  p.category_id,           -- 分类ID
+  (SELECT COUNT(*)        -- 子查询：统计该分类下的商品总数
+   FROM products p2 
+   WHERE p2.category_id = p.category_id) AS category_product_count
+FROM products p
+WHERE p.stock > 0          -- 筛选有库存的商品
+ORDER BY p.price DESC      -- 按价格倒序
+LIMIT 20;`
+                };
+                return generators[table] || generators.users;
+            },
+            
+            // 自由输入模板生成器
+            custom: (table) => {
+                const generators = {
+                    users: `-- 自由编写SQL语句 - 当前操作表：users（用户表）
+-- 表结构：id, username, email, phone, status, created_at
+-- 示例：查询最近注册的用户
+SELECT * FROM users 
+WHERE created_at >= '2024-01-01'
+ORDER BY created_at DESC
+LIMIT 5;`,
+                    orders: `-- 自由编写SQL语句 - 当前操作表：orders（订单表）
+-- 表结构：order_id, user_id, total_amount, status, created_at
+-- 示例：查询大额订单
+SELECT * FROM orders 
+WHERE total_amount > 200
+ORDER BY total_amount DESC
+LIMIT 5;`,
+                    products: `-- 自由编写SQL语句 - 当前操作表：products（商品表）
+-- 表结构：id, name, price, stock, category_id
+-- 示例：查询低库存商品
+SELECT * FROM products 
+WHERE stock < 100
+ORDER BY stock ASC
+LIMIT 5;`
+                };
+                return generators[table] || generators.users;
+            }
+        };
+        
+        // 保留原有的静态模板作为备用
+        const sqlTemplates = {
+            select: (table) => sqlGenerators.select(table),
+            aggregate: (table) => sqlGenerators.aggregate(table),
+            join: (table) => sqlGenerators.join(table),
+            custom: (table) => sqlGenerators.custom(table)
+        };
+        
+        const mockData = {
+            users: [
+                { id: 1, username: '张三', email: 'zhangsan@example.com', phone: '13800138000', status: 1, created_at: '2024-01-15 10:30:00' },
+                { id: 2, username: '李四', email: 'lisi@example.com', phone: '13900139000', status: 1, created_at: '2024-01-14 09:20:00' },
+                { id: 3, username: '王五', email: 'wangwu@example.com', phone: '13700137000', status: 0, created_at: '2024-01-13 08:10:00' },
+            ],
+            orders: [
+                { order_id: 'ORD001', user_id: 1, total_amount: 299.00, status: 'paid', created_at: '2024-01-15 14:30:00' },
+                { order_id: 'ORD002', user_id: 2, total_amount: 599.00, status: 'pending', created_at: '2024-01-15 13:20:00' },
+                { order_id: 'ORD003', user_id: 1, total_amount: 199.00, status: 'shipped', created_at: '2024-01-14 11:00:00' },
+            ],
+            products: [
+                { id: 1, name: '商品A', price: 99.00, stock: 100, category_id: 1 },
+                { id: 2, name: '商品B', price: 199.00, stock: 50, category_id: 1 },
+                { id: 3, name: '商品C', price: 299.00, stock: 30, category_id: 2 },
+            ]
+        };
+        
+        const tableFields = {
+            users: ['id', 'username', 'email', 'phone', 'status', 'created_at'],
+            orders: ['order_id', 'user_id', 'total_amount', 'status', 'created_at'],
+            products: ['id', 'name', 'price', 'stock', 'category_id']
+        };
+        
+        // 当前状态追踪
+        let currentState = {
+            table: 'users',
+            template: 'select',
+            hasUserModified: false
+        };
+        
+        // 初始化SQL输入
+        document.getElementById('sqlInput').value = sqlTemplates.select('users');
+        
+        // 更新可用字段
+        function updateFields(table) {
+            const fieldsContainer = document.getElementById('availableFields');
+            fieldsContainer.innerHTML = tableFields[table].map(f => 
+                `<span style="padding: 4px 8px; background: var(--bg-code); border-radius: 4px; font-size: 11px; color: var(--text-secondary); font-family: monospace;">${f}</span>`
+            ).join('');
+        }
+        updateFields('users');
+        
+        // 检测SQL是否被用户修改过
+        function checkUserModification() {
+            const currentSql = document.getElementById('sqlInput').value;
+            const expectedSql = sqlTemplates[currentState.template](currentState.table);
+            currentState.hasUserModified = currentSql !== expectedSql;
+        }
+        
+        // 生成并更新SQL（带用户修改检测）
+        function updateSqlWithConfirmation(newTable, newTemplate) {
+            const currentSql = document.getElementById('sqlInput').value;
+            const expectedOldSql = sqlTemplates[currentState.template](currentState.table);
+            
+            // 检测用户是否修改过SQL
+            const hasUserContent = currentSql && currentSql.trim().length > 0;
+            const isModified = hasUserContent && currentSql !== expectedOldSql;
+            
+            if (isModified) {
+                // 如果有修改，询问用户是否覆盖
+                const confirmMsg = `您已修改了SQL语句，是否用【${getTableName(newTable)}】的【${getTemplateName(newTemplate)}】模板覆盖当前内容？\n\n点击"确定"覆盖，点击"取消"保留当前内容。`;
+                if (!confirm(confirmMsg)) {
+                    // 用户选择不覆盖，只更新状态不修改SQL
+                    currentState.table = newTable;
+                    currentState.template = newTemplate;
+                    return;
+                }
+            }
+            
+            // 更新状态并生成新SQL
+            currentState.table = newTable;
+            currentState.template = newTemplate;
+            const newSql = sqlTemplates[newTemplate](newTable);
+            document.getElementById('sqlInput').value = newSql;
+            currentState.hasUserModified = false;
+        }
+        
+        // 获取表中文名称
+        function getTableName(table) {
+            const names = {
+                users: '用户表',
+                orders: '订单表',
+                products: '商品表'
+            };
+            return names[table] || table;
+        }
+        
+        // 获取模板中文名称
+        function getTemplateName(template) {
+            const names = {
+                select: '基础查询',
+                aggregate: '聚合统计',
+                join: '表关联',
+                custom: '自由输入'
+            };
+            return names[template] || template;
+        }
+        
+        // 表选择变化 - 联动更新SQL
+        document.getElementById('sqlTableSelect').addEventListener('change', function() {
+            const newTable = this.value;
+            updateFields(newTable);
+            updateSqlWithConfirmation(newTable, currentState.template);
+        });
+        
+        // 模板切换
+        document.querySelectorAll('.sql-template-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.sql-template-btn').forEach(b => {
+                    b.style.borderColor = 'transparent';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                this.style.borderColor = 'var(--accent)';
+                this.style.color = 'var(--accent)';
+                
+                const newTemplate = this.dataset.template;
+                updateSqlWithConfirmation(currentState.table, newTemplate);
+                updateHints(newTemplate);
+            });
+        });
+        
+        // 监听SQL输入框的变化，标记用户修改状态
+        document.getElementById('sqlInput').addEventListener('input', function() {
+            checkUserModification();
+        });
+        
+        function updateHints(template) {
+            const hints = {
+                select: '基础查询：使用SELECT选择字段，WHERE筛选条件，ORDER BY排序，LIMIT限制结果数量。',
+                aggregate: '聚合统计：COUNT计数，SUM求和，AVG平均值，GROUP BY分组统计。',
+                join: '表关联：JOIN连接多张表，ON指定关联条件，可以给表起别名简化书写。',
+                custom: '自由编写SQL语句，系统会模拟执行并返回结果。'
+            };
+            document.getElementById('hintContent').textContent = hints[template];
+        }
+        
+        // 执行SQL
+        document.getElementById('executeSql').addEventListener('click', function() {
+            const sql = document.getElementById('sqlInput').value.trim();
+            if (!sql) {
+                alert('请输入SQL语句');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('sqlResult');
+            const resultTable = document.getElementById('resultTable');
+            
+            // 解析SQL语句
+            const sqlLower = sql.toLowerCase();
+            let data = [];
+            let columns = [];
+            let isAggregate = false;
+            let isJoin = false;
+            
+            // 检测是否是JOIN查询
+            if (sqlLower.includes('join')) {
+                isJoin = true;
+                // 解析JOIN查询 - 支持 users 和 orders 表的关联
+                const hasUsers = sqlLower.includes('from users') || sqlLower.includes('join users');
+                const hasOrders = sqlLower.includes('from orders') || sqlLower.includes('join orders');
+                
+                if (hasUsers && hasOrders) {
+                    // 执行INNER JOIN: users.id = orders.user_id
+                    data = [];
+                    mockData.orders.forEach(order => {
+                        const user = mockData.users.find(u => u.id === order.user_id);
+                        if (user) {
+                            // 根据SELECT字段构建结果
+                            const row = {};
+                            // users表字段
+                            if (sqlLower.includes('u.username') || sqlLower.includes('username')) {
+                                row.username = user.username;
+                            }
+                            if (sqlLower.includes('u.id') || sqlLower.includes('user_id')) {
+                                row.user_id = user.id;
+                            }
+                            if (sqlLower.includes('u.phone') || sqlLower.includes('phone')) {
+                                row.phone = user.phone;
+                            }
+                            if (sqlLower.includes('u.email') || sqlLower.includes('email')) {
+                                row.email = user.email;
+                            }
+                            // orders表字段
+                            if (sqlLower.includes('o.order_id') || sqlLower.includes('order_id')) {
+                                row.order_id = order.order_id;
+                            }
+                            if (sqlLower.includes('o.total_amount') || sqlLower.includes('total_amount')) {
+                                row.total_amount = order.total_amount;
+                            }
+                            if (sqlLower.includes('o.status')) {
+                                row.order_status = order.status;
+                            }
+                            data.push(row);
+                        }
+                    });
+                    
+                    // 应用WHERE条件
+                    if (sqlLower.includes("where")) {
+                        if (sqlLower.includes("status = 'paid'")) {
+                            data = data.filter(d => d.order_status === 'paid' || d.status === 'paid');
+                        }
+                    }
+                }
+            }
+            // 检测是否是聚合查询
+            else if (sqlLower.includes('count(') || sqlLower.includes('sum(') || sqlLower.includes('avg(') || sqlLower.includes('group by')) {
+                isAggregate = true;
+                
+                // 确定查询的表
+                let sourceData = [];
+                if (sqlLower.includes('from users')) {
+                    sourceData = [...mockData.users];
+                } else if (sqlLower.includes('from orders')) {
+                    sourceData = [...mockData.orders];
+                } else if (sqlLower.includes('from products')) {
+                    sourceData = [...mockData.products];
+                }
+                
+                // 应用WHERE条件
+                if (sqlLower.includes('where')) {
+                    if (sqlLower.includes('status = 1')) {
+                        sourceData = sourceData.filter(d => d.status === 1);
+                    } else if (sqlLower.includes("status = 'paid'")) {
+                        sourceData = sourceData.filter(d => d.status === 'paid');
+                    } else if (sqlLower.includes("created_at >= '2024-01-01'")) {
+                        sourceData = sourceData.filter(d => d.created_at >= '2024-01-01');
+                    }
+                }
+                
+                // 执行GROUP BY聚合
+                if (sqlLower.includes('group by')) {
+                    const groupKey = sqlLower.includes('group by status') ? 'status' : null;
+                    
+                    if (groupKey) {
+                        const groups = {};
+                        sourceData.forEach(row => {
+                            const key = row[groupKey];
+                            if (!groups[key]) {
+                                groups[key] = [];
+                            }
+                            groups[key].push(row);
+                        });
+                        
+                        data = Object.keys(groups).map(key => {
+                            const groupRows = groups[key];
+                            const resultRow = { [groupKey]: key };
+                            
+                            if (sqlLower.includes('count(*)')) {
+                                resultRow.count = groupRows.length;
+                            }
+                            if (sqlLower.includes('sum(') && sqlLower.includes('total_amount')) {
+                                resultRow.total = groupRows.reduce((sum, r) => sum + r.total_amount, 0).toFixed(2);
+                            }
+                            if (sqlLower.includes('avg(') && sqlLower.includes('total_amount')) {
+                                const sum = groupRows.reduce((s, r) => s + r.total_amount, 0);
+                                resultRow.avg = (sum / groupRows.length).toFixed(2);
+                            }
+                            
+                            return resultRow;
+                        });
+                    }
+                } else {
+                    // 无GROUP BY的聚合（如COUNT(*)）
+                    const resultRow = {};
+                    if (sqlLower.includes('count(*)')) {
+                        resultRow.total_count = sourceData.length;
+                    }
+                    if (sqlLower.includes('sum(') && sqlLower.includes('total_amount')) {
+                        resultRow.total_amount = sourceData.reduce((sum, r) => sum + r.total_amount, 0).toFixed(2);
+                    }
+                    if (sqlLower.includes('avg(') && sqlLower.includes('total_amount')) {
+                        const sum = sourceData.reduce((s, r) => s + r.total_amount, 0);
+                        resultRow.avg_amount = sourceData.length > 0 ? (sum / sourceData.length).toFixed(2) : 0;
+                    }
+                    data = [resultRow];
+                }
+            }
+            // 基础查询
+            else {
+                // 确定查询的表
+                if (sqlLower.includes('from users')) {
+                    data = [...mockData.users];
+                } else if (sqlLower.includes('from orders')) {
+                    data = [...mockData.orders];
+                } else if (sqlLower.includes('from products')) {
+                    data = [...mockData.products];
+                }
+                
+                // 应用WHERE条件
+                if (sqlLower.includes('where')) {
+                    if (sqlLower.includes('status = 1')) {
+                        data = data.filter(d => d.status === 1);
+                    } else if (sqlLower.includes("status = 'paid'")) {
+                        data = data.filter(d => d.status === 'paid');
+                    } else if (sqlLower.includes("status = 'pending'")) {
+                        data = data.filter(d => d.status === 'pending');
+                    } else if (sqlLower.includes("status = 'shipped'")) {
+                        data = data.filter(d => d.status === 'shipped');
+                    }
+                }
+                
+                // 应用ORDER BY
+                if (sqlLower.includes('order by')) {
+                    if (sqlLower.includes('created_at')) {
+                        const isDesc = sqlLower.includes('desc');
+                        data.sort((a, b) => {
+                            const comparison = a.created_at.localeCompare(b.created_at);
+                            return isDesc ? -comparison : comparison;
+                        });
+                    }
+                }
+            }
+            
+            // 应用LIMIT
+            const limitMatch = sql.match(/LIMIT\s+(\d+)/i);
+            if (limitMatch && !isAggregate) {
+                data = data.slice(0, parseInt(limitMatch[1]));
+            }
+            
+            // 渲染结果
+            if (data.length > 0) {
+                const keys = Object.keys(data[0]);
+                resultTable.innerHTML = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr>${keys.map(k => `<th style="padding: 10px; text-align: left; background: var(--bg-primary); border-bottom: 1px solid var(--border-light);">${k}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(row => `<tr>${keys.map(k => `<td style="padding: 10px; border-bottom: 1px solid var(--border-light);">${row[k] !== undefined ? row[k] : ''}</td>`).join('')}</tr>`).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                resultTable.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">无匹配数据</div>';
+            }
+            
+            document.getElementById('rowCount').textContent = isAggregate ? `返回 ${data.length} 条聚合结果` : `返回 ${data.length} 条记录`;
+            resultDiv.style.display = 'block';
+        });
+        
+        // 清空SQL
+        document.getElementById('clearSql').addEventListener('click', function() {
+            document.getElementById('sqlInput').value = '';
+            document.getElementById('sqlResult').style.display = 'none';
+        });
+        
+        // 格式化SQL
+        document.getElementById('formatSql').addEventListener('click', function() {
+            let sql = document.getElementById('sqlInput').value;
+            sql = sql.replace(/SELECT/gi, 'SELECT\n  ')
+                     .replace(/FROM/gi, '\nFROM')
+                     .replace(/WHERE/gi, '\nWHERE')
+                     .replace(/GROUP BY/gi, '\nGROUP BY')
+                     .replace(/ORDER BY/gi, '\nORDER BY')
+                     .replace(/LIMIT/gi, '\nLIMIT');
+            document.getElementById('sqlInput').value = sql;
+        });
+    </script>
+</body>
+</html>

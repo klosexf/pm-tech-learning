@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阶段一：技术思维入门 - PM Tech Hub</title>
+    <style>
+        :root {
+            --bg-primary: #F5F3EF;
+            --bg-secondary: #FFFFFF;
+            --bg-code: #F8F6F2;
+            --accent: #E86F51;
+            --accent-light: #F5A623;
+            --text-primary: #2D2A26;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9590;
+            --border-light: rgba(0,0,0,0.06);
+            --shadow-soft: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --success: #52C41A;
+            --footer-bg: #1A1816;
+            --footer-text: #A8A4A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 243, 239, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 24px 60px;
+        }
+
+        /* 阶段头部 */
+        .phase-header {
+            text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(82, 196, 26, 0.1);
+            color: var(--success);
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+
+        .phase-illustration {
+            width: 160px;
+            height: 140px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 16px 32px rgba(232, 111, 81, 0.2);
+        }
+
+        .phase-illustration::before {
+            content: '🧠';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px;
+        }
+
+        .phase-illustration::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: var(--bg-primary);
+            border: 3px solid var(--text-primary);
+            border-radius: 50%;
+            box-shadow: 0 3px 0 var(--text-primary);
+        }
+
+        .phase-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .phase-header p {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* 进度总览卡片 */
+        .progress-overview {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .progress-bar-wrap {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, #73D13D 100%);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 课程列表 */
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .section-title-wrap h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .lesson-list {
+            margin-bottom: 60px;
+        }
+
+        .lesson-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .lesson-card.completed {
+            border-left: 4px solid var(--success);
+        }
+
+        .lesson-card.active {
+            border-left: 4px solid var(--accent);
+        }
+
+        .lesson-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .lesson-number {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .lesson-card.completed .lesson-number {
+            background: var(--success);
+            color: white;
+        }
+
+        .lesson-card.active .lesson-number {
+            background: var(--accent);
+            color: white;
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-info h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lesson-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .lesson-desc {
+            padding-left: 60px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .lesson-footer {
+            padding-left: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lesson-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-tag {
+            padding: 5px 12px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .lesson-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: rgba(82, 196, 26, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.active {
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+        }
+
+        .btn-review, .btn-continue {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-review {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+
+        .btn-review:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-continue {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-continue:hover {
+            background: #D45A3D;
+            transform: translateY(-1px);
+        }
+
+        /* 学习说明 */
+        .info-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .info-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 14px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .info-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: rgba(232, 111, 81, 0.1);
+            color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* 知识点总结 */
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .knowledge-item {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .knowledge-item h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .knowledge-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 下一阶段预览 */
+        .next-phase {
+            background: linear-gradient(135deg, rgba(232, 111, 81, 0.05) 0%, rgba(245, 166, 35, 0.05) 100%);
+            border: 2px dashed var(--accent);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .next-phase-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .next-phase h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .next-phase p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .btn-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: var(--accent);
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-next:hover {
+            background: #D45A3D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(232, 111, 81, 0.3);
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--footer-bg);
+            padding: 48px 24px 40px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo span:first-child {
+            color: var(--accent);
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--footer-text);
+            line-height: 1.8;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .phase-header h1 {
+                font-size: 28px;
+            }
+
+            .progress-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .lesson-desc,
+            .lesson-footer {
+                padding-left: 0;
+            }
+
+            .lesson-header {
+                margin-bottom: 16px;
+            }
+
+            .lesson-footer {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .knowledge-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lesson-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .lesson-card:nth-child(1) { animation-delay: 0.1s; }
+        .lesson-card:nth-child(2) { animation-delay: 0.15s; }
+        .lesson-card:nth-child(3) { animation-delay: 0.2s; }
+        .lesson-card:nth-child(4) { animation-delay: 0.25s; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">◉</div>
+                <span>PM Tech Hub</span>
+            </a>
+            <a href="index.html" class="back-link">
+                <span>←</span>
+                <span>返回学习路径</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 阶段头部 -->
+        <section class="phase-header">
+            <div class="phase-badge">
+                <span>✓</span>
+                <span>已完成</span>
+            </div>
+            <div class="phase-illustration"></div>
+            <h1>阶段一：技术思维入门</h1>
+            <p>建立基础技术思维，理解互联网产品的工作原理，学习如何与开发团队有效沟通。这是所有产品经理的技术必修课。</p>
+        </section>
+
+        <!-- 进度总览 -->
+        <section class="progress-overview">
+            <div class="progress-header">
+                <h2 class="progress-title">学习进度</h2>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">6/6</div>
+                        <div class="stat-label">课程完成</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">120</div>
+                        <div class="stat-label">学习分钟</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">实践练习</div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill"></div>
+                </div>
+            </div>
+            <div class="progress-meta">
+                <span>🎉 恭喜你已完成本阶段全部课程</span>
+            </div>
+        </section>
+
+        <!-- 课程列表 -->
+        <section class="lesson-list">
+            <div class="section-title-wrap">
+                <div class="section-icon">📚</div>
+                <h2>课程列表</h2>
+            </div>
+
+            <!-- 课程 1 -->
+            <div class="lesson-card completed" data-lesson-id="lesson-1-1" data-lesson-url="lesson-1-1-detail.html">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>1.1 互联网产品是如何工作的</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 15分钟</span>
+                            <span>📄 图文课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">从输入网址到页面展现，了解浏览器、服务器、数据库之间的协作关系。掌握HTTP请求的基本流程。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">浏览器</span>
+                        <span class="lesson-tag">HTTP</span>
+                        <span class="lesson-tag">服务器</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" data-lesson-url="lesson-1-1-detail.html">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 2 -->
+            <div class="lesson-card completed" data-lesson-id="lesson-1-2" data-lesson-url="lesson-1-2-detail.html">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>1.2 前端与后端的协作</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 20分钟</span>
+                            <span>🎬 视频课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">理解前端工程师和后端工程师的分工边界，学会用正确的方式与两类开发同学沟通需求。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">前端</span>
+                        <span class="lesson-tag">后端</span>
+                        <span class="lesson-tag">协作</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" data-lesson-url="lesson-1-2-detail.html">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 3 -->
+            <div class="lesson-card completed" data-lesson-id="lesson-1-4" data-lesson-url="lesson-1-4-detail.html">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>1.3 数据是如何流转的</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 18分钟</span>
+                            <span>📄 图文课程</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">从用户操作到数据存储，追踪一条数据在系统中的完整生命周期。理解数据库的基本作用。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">数据流</span>
+                        <span class="lesson-tag">数据库</span>
+                        <span class="lesson-tag">存储</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" data-lesson-url="lesson-1-4-detail.html">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 4 -->
+            <div class="lesson-card completed" data-lesson-id="lesson-1-3" data-lesson-url="lesson-1-3-detail.html">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>1.4 API：数据的搬运工</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 25分钟</span>
+                            <span>📝 实战演练</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">深入理解API的概念，学会阅读接口文档，掌握请求方法、参数、返回值的意义。附赠Postman实操练习。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">API</span>
+                        <span class="lesson-tag">Postman</span>
+                        <span class="lesson-tag">接口文档</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" data-lesson-url="lesson-1-3-detail.html">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 5 -->
+            <div class="lesson-card completed" data-lesson-id="lesson-1-5" data-lesson-url="lesson-1-5-detail.html">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>1.5 技术术语速查手册</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 12分钟</span>
+                            <span>📋 速查清单</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">整理产品经理最常遇到的30个技术术语，用通俗语言解释清楚。包含Cookie/Session、缓存、异步等核心概念。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">术语</span>
+                        <span class="lesson-tag">缓存</span>
+                        <span class="lesson-tag">异步</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已完成</span>
+                        <button class="btn-review" data-lesson-url="lesson-1-5-detail.html">复习</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程 6 -->
+            <div class="lesson-card completed" data-lesson-id="lesson-1-6" data-lesson-url="lesson-1-6-detail.html">
+                <div class="lesson-header">
+                    <div class="lesson-number">✓</div>
+                    <div class="lesson-info">
+                        <h3>1.6 阶段实战：绘制系统架构图</h3>
+                        <div class="lesson-meta">
+                            <span>⏱ 30分钟</span>
+                            <span>🎯 阶段作业</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="lesson-desc">综合运用所学知识，为一个简易电商系统设计架构图。提交后可获得导师点评和学习建议。</p>
+                <div class="lesson-footer">
+                    <div class="lesson-tags">
+                        <span class="lesson-tag">架构图</span>
+                        <span class="lesson-tag">实战</span>
+                        <span class="lesson-tag">作业</span>
+                    </div>
+                    <div class="lesson-status">
+                        <span class="status-badge completed">✓ 已提交</span>
+                        <button class="btn-review" data-lesson-url="lesson-1-6-detail.html">查看反馈</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学习说明 -->
+        <section class="info-section">
+            <h3><span>💡</span> 本阶段你将掌握</h3>
+            <ul class="info-list">
+                <li>理解互联网产品的基本工作原理，能与开发团队用"同一种语言"沟通</li>
+                <li>掌握API的基础知识，能够阅读和理解接口文档</li>
+                <li>建立数据流转的思维模型，理解用户操作背后的技术实现</li>
+                <li>熟悉30+核心技术术语，不再在技术讨论中一头雾水</li>
+                <li>具备绘制简单系统架构图的能力，清晰表达产品需求</li>
+            </ul>
+        </section>
+
+        <!-- 核心知识点 -->
+        <section class="info-section">
+            <h3><span>🎯</span> 核心知识点总结</h3>
+            <div class="knowledge-grid">
+                <div class="knowledge-item">
+                    <h4>HTTP 请求流程</h4>
+                    <p>DNS解析 → 建立连接 → 发送请求 → 服务器处理 → 返回响应 → 渲染页面</p>
+                </div>
+                <div class="knowledge-item">
+                    <h4>前后端分工</h4>
+                    <p>前端负责界面展示和交互，后端负责业务逻辑和数据处理</p>
+                </div>
+                <div class="knowledge-item">
+                    <h4>API 三要素</h4>
+                    <p>接口地址(URL)、请求方法(GET/POST)、参数与返回值</p>
+                </div>
+                <div class="knowledge-item">
+                    <h4>数据流转路径</h4>
+                    <p>用户操作 → 前端 → API → 后端 → 数据库 → 返回结果</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 下一阶段 -->
+        <section class="next-phase">
+            <div class="next-phase-icon">🗄️</div>
+            <h3>准备好进入下一阶段了吗？</h3>
+            <p>阶段二将带你深入学习数据库原理、SQL查询和数据建模，为数据驱动决策打下基础。</p>
+            <a href="#" class="btn-next">
+                <span>进入阶段二</span>
+                <span>→</span>
+            </a>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>◉</span>
+                <span>PM Tech Hub</span>
+            </div>
+            <p class="footer-copy">
+                © 2024 PM Tech Hub. 专为产品经理打造的技术学习平台。<br>
+                让技术不再成为产品路上的绊脚石
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 课程管理配置
+        const lessonConfig = {
+            // 课程ID与详情页URL映射
+            lessons: {
+                'lesson-1-1': 'lesson-1-1-detail.html',
+                'lesson-1-2': 'lesson-1-2-detail.html',
+                'lesson-1-3': 'lesson-1-3-detail.html',
+                'lesson-1-4': 'lesson-1-4-detail.html',
+                'lesson-1-5': 'lesson-1-5-detail.html',
+                'lesson-1-6': 'lesson-1-6-detail.html'
+            },
+            
+            // 获取课程URL
+            getLessonUrl: function(lessonId) {
+                return this.lessons[lessonId] || null;
+            },
+            
+            // 获取课程ID from URL参数
+            getLessonIdFromUrl: function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('lessonId');
+            },
+            
+            // 跳转到课程详情页
+            navigateToLesson: function(lessonId) {
+                const url = this.getLessonUrl(lessonId);
+                if (url) {
+                    // 添加路由参数
+                    const detailUrl = `${url}?id=${lessonId}`;
+                    console.log(`导航到课程: ${lessonId} -> ${detailUrl}`);
+                    window.location.href = detailUrl;
+                } else {
+                    console.error(`未找到课程: ${lessonId}`);
+                    alert('课程页面暂未开放，敬请期待！');
+                }
+            }
+        };
+
+        // 页面加载时检查URL参数
+        document.addEventListener('DOMContentLoaded', function() {
+            const lessonId = lessonConfig.getLessonIdFromUrl();
+            if (lessonId) {
+                console.log(`从URL参数加载课程: ${lessonId}`);
+                // 可以在这里处理从其他页面带参数跳转过来的情况
+            }
+        });
+
+        // 卡片点击效果 - 整个卡片可点击跳转
+        document.querySelectorAll('.lesson-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 如果点击的是按钮，不触发卡片点击
+                if (e.target.closest('button')) {
+                    return;
+                }
+                
+                const lessonId = this.dataset.lessonId;
+                const lessonUrl = this.dataset.lessonUrl;
+                
+                if (lessonId && lessonUrl) {
+                    // 添加视觉反馈
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        lessonConfig.navigateToLesson(lessonId);
+                    }, 150);
+                }
+            });
+            
+            // 添加鼠标悬停样式提示
+            card.style.cursor = 'pointer';
+        });
+
+        // 复习/查看反馈按钮点击
+        document.querySelectorAll('.btn-review').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const lessonUrl = this.dataset.lessonUrl;
+                const card = this.closest('.lesson-card');
+                const lessonId = card ? card.dataset.lessonId : null;
+                
+                if (lessonId && lessonUrl) {
+                    // 按钮点击动画
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        lessonConfig.navigateToLesson(lessonId);
+                    }, 100);
+                }
+            });
+        });
+
+        // 添加键盘导航支持
+        document.querySelectorAll('.lesson-card').forEach(card => {
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const lessonId = this.dataset.lessonId;
+                    if (lessonId) {
+                        lessonConfig.navigateToLesson(lessonId);
+                    }
+                }
+            });
+        });
+
+        // 进度条动画
+        function animateProgressBar() {
+            const progressBar = document.querySelector('.progress-bar-fill');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 300);
+            }
+        }
+        
+        // 页面加载时执行进度条动画
+        animateProgressBar();
+    </script>
+</body>
+</html>
